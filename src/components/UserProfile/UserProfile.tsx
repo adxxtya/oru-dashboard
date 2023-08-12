@@ -9,9 +9,9 @@ import { IoIosMedal } from "react-icons/io";
 const UserProfile = () => {
   const { data: session } = useSession();
   return (
-    <div className="flex w-full font-outfit">
+    <div className="flex w-full flex-col font-outfit md:flex-row">
       {/* Left Side */}
-      <div className="flex w-[50%] flex-col p-8">
+      <div className="flex w-full flex-col p-0 md:w-[50%] md:p-8">
         {/* User Photo and Upload */}
         <div className="mt-6 flex justify-between">
           <div>
@@ -19,7 +19,7 @@ const UserProfile = () => {
               src={session?.user.image || ""}
               width={1000}
               height={1000}
-              className="h-36 w-36 rounded-full"
+              className="h-16 w-16 rounded-full md:h-36 md:w-36"
               alt="User Image"
             />
           </div>
@@ -120,7 +120,7 @@ const UserProfile = () => {
       </div>
 
       {/* Right Side */}
-      <div className="flex w-[50%] flex-col p-8">
+      <div className="flex w-full flex-col p-0 md:w-[50%] md:p-8">
         {/* Professional Details */}
         <div className="mt-6">
           <Card>
@@ -152,7 +152,7 @@ const UserProfile = () => {
               </div>
               <div className="mt-4">
                 <Card className="rounded-full p-1">
-                  <div className="flex p-2">
+                  <div className="flex">
                     <div className="ml-10 flex w-[10%] items-center justify-center">
                       <IoIosMedal color="#FFCE10" size={50} />
                     </div>

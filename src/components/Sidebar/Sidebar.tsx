@@ -33,8 +33,8 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
   );
 
   return (
-    <div className="flex h-[100dvh] w-full font-outfit sm:hidden md:flex">
-      <div className="z-[99] flex h-screen w-[330px] bg-[#FFF] shadow-md">
+    <div className="flex h-[100dvh] w-full font-outfit ">
+      <div className="z-[99] hidden h-screen w-[330px] bg-[#FFF] shadow-md md:flex">
         <Box>
           <div className="flex h-full w-full flex-col ">
             {routes.map((route) => (

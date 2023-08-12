@@ -15,7 +15,7 @@ export default function Home() {
           Log in
         </button>
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-          <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
+          <h1 className="text-center text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
             Welcome to{" "}
             <span className="text-[hsl(280,100%,70%)]">ORUPHONES</span>
           </h1>
