@@ -54,12 +54,14 @@ model User {
     image               String?
     phone               String?
     about               String?
-    skills              String[]
     professionalDetails String?
-    certifications      Certification[]
+    company             String?
+    position            String?
+    skills              String[]
     experience          String[]
     education           String[]
     connections         String[]
+    certifications      Certification[]
     imageUrl            String?
     accounts            Account[]
     sessions            Session[]
