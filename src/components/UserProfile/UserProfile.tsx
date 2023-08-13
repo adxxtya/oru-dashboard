@@ -15,6 +15,7 @@ import {
 import { useToast } from "../ui/use-toast";
 import { Tabs, TabsContent } from "@radix-ui/react-tabs";
 import { Input } from "../ui/input";
+import { type Session } from "next-auth/core/types";
 
 const UserProfile = () => {
   let emailID;
@@ -45,6 +46,14 @@ const UserProfile = () => {
     connections: [],
     imageUrl: "",
   });
+
+  const [sessionState, setSessionState] = useState<Session | undefined | null>(
+    undefined
+  );
+
+  useEffect(() => {
+    setSessionState(session);
+  }, [session]);
 
   async function updateUserData() {
     if (session?.user.email) {
@@ -125,7 +134,7 @@ const UserProfile = () => {
     }
   }, [isMounted, session?.user]);
 
-  if (loading && !userDataFetched) {
+  if (loading && sessionState === undefined) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <div className="loader h-24 w-24 rounded-full border-8 border-t-8 border-gray-200 ease-linear"></div>
