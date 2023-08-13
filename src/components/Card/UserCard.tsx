@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { type ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 import { Button } from "../ui/button";
 
@@ -17,7 +16,7 @@ const UserCard: React.FC<UserCardProps> = ({
   name,
   position,
   company,
-  connection,
+  // connection,
   userImage,
 }) => {
   return (
