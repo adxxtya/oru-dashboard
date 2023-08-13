@@ -1,4 +1,4 @@
-import { signIn } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
 
@@ -13,6 +13,9 @@ export default function Home() {
       <main className="flex h-[90vh] flex-col items-center justify-center bg-gradient-to-b from-[#3A4488] to-[#1E2875] pt-10 font-outfit text-black">
         <button className="bg-red-400 p-4" onClick={() => signIn()}>
           Log in
+        </button>
+        <button className="bg-red-400 p-4" onClick={() => signOut()}>
+          Log out
         </button>
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
           <h1 className="text-center text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">

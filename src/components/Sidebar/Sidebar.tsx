@@ -3,15 +3,15 @@ import { useMemo } from "react";
 import { FiChevronRight } from "react-icons/fi";
 import Box from "./Box";
 import SidebarItem from "./SidebarItem";
-import { useRouter } from "next/navigation";
 import Navbar from "../Navbar/Navbar";
+import React from "react";
 
 interface SidebarProps {
   children: React.ReactNode;
+  isLoading: Boolean;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ children }) => {
-  const router = useRouter();
+const Sidebar: React.FC<SidebarProps> = ({ children, isLoading }) => {
   const pathname = usePathname();
 
   const routes = useMemo(
@@ -38,7 +38,7 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
         <Box>
           <div className="flex h-full w-full flex-col ">
             {routes.map((route) => (
-              <SidebarItem key={route.label} {...route} />
+              <SidebarItem key={route.label} {...route} isLoading={isLoading} />
             ))}
           </div>
         </Box>

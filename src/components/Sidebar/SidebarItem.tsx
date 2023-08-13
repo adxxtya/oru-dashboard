@@ -9,6 +9,7 @@ interface SidebarItemsProps {
   active?: boolean;
   onClick?: () => void;
   href: string;
+  isLoading: Boolean;
 }
 
 const SidebarItem: React.FC<SidebarItemsProps> = ({
@@ -17,6 +18,7 @@ const SidebarItem: React.FC<SidebarItemsProps> = ({
   href,
   onClick,
   active,
+  isLoading,
 }) => {
   const handleClick = () => {
     if (onClick) {
@@ -39,7 +41,8 @@ const SidebarItem: React.FC<SidebarItemsProps> = ({
         <div
           className={twMerge(
             "flex h-full w-[70%] items-center justify-center whitespace-nowrap p-3 text-2xl",
-            active ? "rounded-lg border border-[#413B89]" : ""
+            active ? "rounded-lg border border-[#413B89]" : "",
+            isLoading ? "pointer-events-none" : ""
           )}
         >
           {label}
