@@ -8,7 +8,7 @@ const config = {
     defaultLocale: "en",
   },
   images: {
-    domains: ["lh3.googleusercontent.com", "avatars.githubusercontent.com"]
+    domains: ["lh3.googleusercontent.com", "avatars.githubusercontent.com", "raw.githubusercontent.com", "axkdcpjgskqzvafvhoun.supabase.co"]
   },
 };
 

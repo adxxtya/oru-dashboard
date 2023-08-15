@@ -13,6 +13,7 @@ export default async function handler(
     emailID,
     about,
     skills,
+    imageUrl,
     professionalDetails,
     certificationsArray,
     experienceArray,
@@ -48,6 +49,11 @@ export default async function handler(
       if (about) {
         updateData.about = about;
         updatedFields.about = about;
+      }
+
+      if (imageUrl) {
+        updateData.imageUrl = imageUrl;
+        updatedFields.imageUrl = imageUrl;
       }
 
       if (skills.length > 0) {

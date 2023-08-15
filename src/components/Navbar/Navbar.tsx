@@ -24,7 +24,7 @@ import {
 import Link from "next/link";
 import { ChevronRightIcon } from "lucide-react";
 
-const Navbar: React.FC = ({}) => {
+const Navbar: React.FC = () => {
   const [mobileResponsive, setMobileResponsive] = useState(false);
 
   useEffect(() => {
@@ -32,6 +32,43 @@ const Navbar: React.FC = ({}) => {
   }, []);
 
   const { data: session } = useSession();
+
+  const [userData, setUserData] = useState<any>(null);
+
+  async function getUserData() {
+    console.log("userData1");
+
+    if (session?.user.email) {
+      console.log("userData2");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/user-actions/get-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            emailID: session?.user.email,
+          }),
+        }
+      );
+      console.log("userData3");
+
+      const data = await response.json();
+      if (typeof data === "string") {
+        const userData = JSON.parse(data);
+        setUserData(userData);
+      } else {
+        setUserData(data);
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (session?.user) {
+      getUserData();
+    }
+  }, [session]);
 
   return (
     <div
@@ -138,7 +175,11 @@ const Navbar: React.FC = ({}) => {
                   <div className="flex h-full  w-full items-center justify-between ">
                     <div className="flex h-full w-full items-center justify-center gap-2  pl-2 pr-6">
                       <Image
-                        src={session?.user.image || "/user.png"}
+                        src={
+                          userData
+                            ? userData.imageUrl || session?.user.image
+                            : "/user.png"
+                        }
                         width={1000}
                         height={1000}
                         alt="User Avatar"

@@ -1,6 +1,6 @@
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { type ChangeEvent, useEffect, useState } from "react";
 import Card from "../Card/Card";
 import { Button } from "../ui/button";
 import { GiStarsStack } from "react-icons/gi";
@@ -24,6 +24,12 @@ import { Tabs, TabsContent } from "@radix-ui/react-tabs";
 import { Input } from "../ui/input";
 import { type Session } from "next-auth/core/types";
 import AuthModal from "../Modal/AuthModal";
+import { supabase } from "@/server/supabase";
+
+interface FilePreview {
+  url: string;
+  file: File;
+}
 
 const UserProfile = () => {
   let emailID;
@@ -38,6 +44,9 @@ const UserProfile = () => {
   const [userUpdated, setUserUpdated] = useState(true);
   const [userDataFetched, setUserDataFetched] = useState(false);
   const [newSkill, setNewSkill] = useState<any>("");
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [filePreviews, setFilePreviews] = useState<FilePreview[]>([]);
+
   if (session?.user.email) {
     emailID = session.user.email;
   }
@@ -58,6 +67,7 @@ const UserProfile = () => {
   const [experienceArray, setExperienceArray] = useState<any>([]);
   const [certificationsArray, setCertificationsArray] = useState<any>([]);
   const [educationArray, setEducationArray] = useState<any>([]);
+  const [imageLink, setImageLink] = useState<any>("");
   const [sessionState, setSessionState] = useState<Session | undefined | null>(
     undefined
   );
@@ -66,8 +76,55 @@ const UserProfile = () => {
     setSessionState(session);
   }, [session]);
 
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    console.log("files", files);
+
+    if (files && files.length > 0) {
+      const newPreviews: FilePreview[] = Array.from(files).map((file) => ({
+        url: URL.createObjectURL(file),
+        file,
+      }));
+      setFilePreviews((prevPreviews) => [...prevPreviews, ...newPreviews]);
+      setSelectedFiles((prevSelectedFiles) => [
+        ...prevSelectedFiles,
+        ...Array.from(files),
+      ]);
+    }
+  };
+
+  const handleFileUpload = async () => {
+    if (selectedFiles.length === 0) {
+      console.log("No files selected.");
+      return;
+    }
+
+    for (const file of selectedFiles) {
+      setLoading(true);
+      const { data, error } = await supabase.storage
+        .from("user-uploaded-files")
+        .upload(`${session?.user?.email ?? ""}/` + file.name, file);
+
+      if (data) {
+        const { data } = await supabase.storage
+          .from("user-uploaded-files")
+          .getPublicUrl(`${session?.user?.email ?? ""}/` + file.name);
+        console.log("image", data.publicUrl);
+        setImageLink(data.publicUrl);
+        setLoading(false);
+      } else if (error) {
+        console.log("Error uploading file:", error);
+      }
+      setLoading(false);
+    }
+    updateUserData();
+    updateRedisUser();
+    setLoading(false);
+  };
+
   async function updateUserData() {
     if (session?.user.email) {
+      console.log("Updating...");
       setLoading(true);
 
       const updatedUserDetails = {
@@ -75,7 +132,7 @@ const UserProfile = () => {
         emailID: session?.user.email,
         experienceArray: experienceArray,
         certificationsArray: certificationsArray,
-        educationArray: educationArray, // Add education array
+        educationArray: educationArray,
       };
 
       if (experienceArray && experienceArray.length > 0) {
@@ -125,6 +182,12 @@ const UserProfile = () => {
         };
       }
 
+      console.log("imageLink", imageLink);
+
+      if (imageLink) {
+        updatedUserDetails.imageUrl = imageLink;
+      }
+
       console.log(updatedUserDetails);
 
       const response = await fetch(
@@ -149,7 +212,9 @@ const UserProfile = () => {
           description: `Your ${updatedField} was changed to "${updatedValue}".`,
         });
       } else {
-        console.log("Response status:", response.status);
+        toast({
+          title: `Error Occured! :(`,
+        });
       }
       setLoading(false);
     }
@@ -221,6 +286,14 @@ const UserProfile = () => {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    if (imageLink) {
+      updateUserData();
+      updateRedisUser();
+      getUserData();
+    }
+  }, [imageLink]);
 
   useEffect(() => {
     getUserData();
@@ -629,25 +702,65 @@ const UserProfile = () => {
                 value="upload-photo"
                 className="flex w-full flex-col items-center justify-center"
               >
-                <Input
-                  type="text"
-                  value={userDetails.imageUrl}
-                  placeholder="Your Name"
-                  onChange={(event) =>
-                    setUserDetails({
-                      ...userDetails,
-                      imageUrl: event.target.value,
-                    })
-                  }
-                />
+                {filePreviews.length > 0 ? (
+                  <div className="flex flex-col items-center justify-center pb-6 pt-5">
+                    {filePreviews.map((preview, index) => (
+                      <img
+                        key={index}
+                        src={preview.url}
+                        alt={`Uploaded File ${index}`}
+                        className="mb-4 max-h-64"
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <label
+                    htmlFor="dropzone-file"
+                    className="dark:hover:bg-bray-800 flex h-64 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+                  >
+                    <div className="flex flex-col items-center justify-center pb-6 pt-5">
+                      <svg
+                        className="mb-4 h-8 w-8 text-gray-500 dark:text-gray-400"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 20 16"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                        />
+                      </svg>
+                      <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                        <span className="font-semibold">Click to upload</span>{" "}
+                        or drag and drop
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        SVG, PNG, JPG, GIF, MP4, etc.
+                      </p>
+                    </div>
+                    <input
+                      id="dropzone-file"
+                      type="file"
+                      className="hidden"
+                      multiple
+                      onChange={handleFileChange}
+                    />
+                  </label>
+                )}
                 <Button
                   variant="destructive"
                   className="mt-2"
-                  onClick={updateUserData}
+                  onClick={handleFileUpload}
+                  isLoading={loading}
                 >
                   Upload Image
                 </Button>
               </TabsContent>
+
               <TabsContent
                 value="edit-name"
                 className="flex w-full flex-col items-center justify-center"
@@ -663,6 +776,7 @@ const UserProfile = () => {
                 <Button
                   variant="destructive"
                   className="mt-2"
+                  isLoading={loading}
                   onClick={updateUserData}
                 >
                   Update Name
@@ -687,6 +801,7 @@ const UserProfile = () => {
                   variant="destructive"
                   className="mt-2"
                   onClick={updateUserData}
+                  isLoading={loading}
                 >
                   Update Email
                 </Button>
@@ -710,6 +825,7 @@ const UserProfile = () => {
                   variant="destructive"
                   className="mt-2"
                   onClick={updateUserData}
+                  isLoading={loading}
                 >
                   Update Phone Number
                 </Button>
@@ -733,6 +849,7 @@ const UserProfile = () => {
                   variant="destructive"
                   className="mt-2"
                   onClick={updateUserData}
+                  isLoading={loading}
                 >
                   Update About Section
                 </Button>
@@ -767,6 +884,7 @@ const UserProfile = () => {
                 <Button
                   variant="ghost"
                   className="mt-2 bg-[#f1f5f9]"
+                  isLoading={loading}
                   onClick={() => {
                     if (newSkill) {
                       setUserDetails({
@@ -783,6 +901,7 @@ const UserProfile = () => {
                   variant="destructive"
                   className="mt-2"
                   onClick={updateUserData}
+                  isLoading={loading}
                 >
                   Update All Skills
                 </Button>
@@ -806,6 +925,7 @@ const UserProfile = () => {
                   variant="destructive"
                   className="mt-2"
                   onClick={updateUserData}
+                  isLoading={loading}
                 >
                   Update Professional Details
                 </Button>
@@ -853,6 +973,7 @@ const UserProfile = () => {
                     </div>
                   ))}
                   <Button
+                    isLoading={loading}
                     onClick={() =>
                       setCertificationsArray([
                         ...certificationsArray,
@@ -866,6 +987,7 @@ const UserProfile = () => {
                     variant="destructive"
                     className="mt-2"
                     onClick={updateUserData}
+                    isLoading={loading}
                   >
                     Update Certifications
                   </Button>
@@ -941,6 +1063,7 @@ const UserProfile = () => {
                     </div>
                   ))}
                   <Button
+                    isLoading={loading}
                     onClick={() =>
                       setExperienceArray([
                         ...experienceArray,
@@ -954,6 +1077,7 @@ const UserProfile = () => {
                     variant="destructive"
                     className="mt-2"
                     onClick={updateUserData}
+                    isLoading={loading}
                   >
                     Update Experience
                   </Button>
@@ -1011,6 +1135,7 @@ const UserProfile = () => {
                     </div>
                   ))}
                   <Button
+                    isLoading={loading}
                     onClick={() =>
                       setEducationArray([
                         ...educationArray,
@@ -1024,6 +1149,7 @@ const UserProfile = () => {
                     variant="destructive"
                     className="mt-2"
                     onClick={updateUserData}
+                    isLoading={loading}
                   >
                     Update Education
                   </Button>

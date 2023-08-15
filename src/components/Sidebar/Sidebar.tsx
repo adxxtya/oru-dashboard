@@ -28,6 +28,12 @@ const Sidebar: React.FC<SidebarProps> = ({ children, isLoading }) => {
         active: pathname === "/connections",
         href: "/connections",
       },
+      {
+        icon: FiChevronRight,
+        label: "About",
+        active: pathname === "/about",
+        href: "/about",
+      },
     ],
     [pathname]
   );
