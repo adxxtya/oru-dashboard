@@ -14,6 +14,6 @@ export default async function handler(
   }
 
   const users = await prisma.user.findMany();
-  await redis.set("all-users", JSON.stringify(users));
+  await redis.set("all-users", JSON.stringify(users), "EX", 60);
   return res.status(200).json(users);
 }

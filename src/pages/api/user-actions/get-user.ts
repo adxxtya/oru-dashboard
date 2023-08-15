@@ -28,7 +28,7 @@ export default async function handler(
       });
 
       if (user) {
-        await redis.set(emailID, JSON.stringify(user));
+        await redis.set(emailID, JSON.stringify(user), "EX", 60);
         return res.status(200).json(user);
       } else {
         throw new Error("User does not exists in the database.");

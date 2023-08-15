@@ -158,6 +158,7 @@ const UserProfile = () => {
   async function getUserData() {
     setLoading(true);
     if (session?.user.email) {
+      await updateRedisUser();
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/user-actions/get-user`,
         {
@@ -231,8 +232,6 @@ const UserProfile = () => {
       getUserData();
     }
   }, [isMounted, session?.user]);
-
-  console.log("userData?.education", userData);
 
   if (loading && sessionState === undefined) {
     return (

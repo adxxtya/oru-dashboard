@@ -13,6 +13,7 @@ interface ConnectionsProps {}
 const Connections: React.FC<ConnectionsProps> = ({}) => {
   const { data: session } = useSession();
   const [myData, setMyData] = useState<User | any>(null);
+  const [loading, setLoading] = useState<Boolean>(false);
   const [sessionState, setSessionState] = useState<Session | undefined | null>(
     undefined
   );
@@ -67,6 +68,7 @@ const Connections: React.FC<ConnectionsProps> = ({}) => {
   }
 
   const addConnection = async (email: any) => {
+    setLoading(true);
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/user-actions/add-connection`,
@@ -84,6 +86,7 @@ const Connections: React.FC<ConnectionsProps> = ({}) => {
 
       if (response.ok) {
         getAllUsers();
+        setLoading(false);
         setUserConnections([...userConnections, email]);
         setAllUsers([...allUsers]);
         toast({
@@ -92,15 +95,21 @@ const Connections: React.FC<ConnectionsProps> = ({}) => {
         });
       }
     } catch (error) {
+      setLoading(false);
+
       toast({
         title: `Error!`,
         description: `${error}`,
       });
       console.error("Error adding connection:", error);
+    } finally {
+      setLoading(false);
     }
+    setLoading(false);
   };
 
   const removeConnection = async (email: any) => {
+    setLoading(true);
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/user-actions/remove-connection`,
@@ -117,6 +126,7 @@ const Connections: React.FC<ConnectionsProps> = ({}) => {
       );
       if (response.ok) {
         getAllUsers();
+        setLoading(false);
         toast({
           title: `You both got disconnected :(`,
           description: `You were removed from their connections too.`,
@@ -127,12 +137,18 @@ const Connections: React.FC<ConnectionsProps> = ({}) => {
         setAllUsers([...allUsers]);
       }
     } catch (error) {
+      setLoading(false);
+
       console.error("Error removing connection:", error);
       toast({
         title: `Error!`,
         description: `${error}`,
       });
+    } finally {
+      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -186,6 +202,7 @@ const Connections: React.FC<ConnectionsProps> = ({}) => {
                                   {session?.user ? (
                                     <Button
                                       className="mt-2 bg-[#BAB6EB] text-xs text-black"
+                                      isLoading={loading}
                                       onClick={() =>
                                         removeConnection(connectedUser.email)
                                       }
@@ -195,6 +212,7 @@ const Connections: React.FC<ConnectionsProps> = ({}) => {
                                   ) : (
                                     <Button
                                       onClick={() => setShowAuthModal(true)}
+                                      isLoading={loading}
                                     >
                                       Disconnect
                                     </Button>
@@ -275,12 +293,14 @@ const Connections: React.FC<ConnectionsProps> = ({}) => {
                                     <Button
                                       className="mt-2 bg-[#BAB6EB] text-xs text-black"
                                       onClick={() => addConnection(user.email)}
+                                      isLoading={loading}
                                     >
                                       Connect
                                     </Button>
                                   ) : (
                                     <Button
                                       onClick={() => setShowAuthModal(true)}
+                                      isLoading={loading}
                                     >
                                       Connect
                                     </Button>

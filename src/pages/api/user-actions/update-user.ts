@@ -20,8 +20,6 @@ export default async function handler(
     connections,
   } = await req.body;
 
-  console.log("certificates", certificationsArray);
-
   if (emailID) {
     const user = await prisma.user.findUnique({
       where: {
@@ -66,6 +64,11 @@ export default async function handler(
         updatedFields.professionalDetails = professionalDetails;
       }
 
+      if (connections.length > 0) {
+        updateData.connections = connections;
+        updatedFields.connections = connections;
+      }
+
       if (educationArray) {
         const userEducation = user.education || [];
         const sanitizedEducationArray = educationArray.map(
@@ -78,11 +81,6 @@ export default async function handler(
         };
 
         updatedFields.education = mergedEducation;
-      }
-
-      if (connections.length > 0) {
-        updateData.connections = connections;
-        updatedFields.connections = connections;
       }
 
       if (experienceArray) {
@@ -137,7 +135,7 @@ export default async function handler(
             experience: true,
           },
         });
-        await redis.set(emailID, JSON.stringify(userCache));
+        await redis.set(emailID, JSON.stringify(userCache), "EX", 60);
       } else {
         console.log("No fields to update.");
         res.status(400).json({ error: "No fields to update." });
