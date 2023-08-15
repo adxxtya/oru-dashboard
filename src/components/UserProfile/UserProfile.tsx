@@ -323,6 +323,7 @@ const UserProfile = () => {
       <div className="flex w-full flex-col font-outfit md:flex-row">
         <Dialog onOpenChange={getUserData}>
           {/* Left Side */}
+
           <div className="flex w-full flex-col p-0 md:w-[50%] md:p-8">
             {/* User Photo and Upload */}
             <div className="mt-6 flex justify-between">
