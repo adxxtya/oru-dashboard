@@ -8,7 +8,6 @@ const AuthModal = ({ onClose }: any) => {
       onClick={onClose}
     >
       <div className="w-full max-w-md transform rounded-lg bg-white p-6 shadow-lg transition-all duration-300">
-        <h2 className="mb-2 text-center text-lg font-semibold">Sign In</h2>
         <p className="mb-4 text-center text-xl text-muted-foreground">
           Nuh-uh! Please Login First
         </p>
