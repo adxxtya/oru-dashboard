@@ -7,9 +7,11 @@ import {
 } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
-import CredentialsProvider from "next-auth/providers/credentials";
 import { env } from "@/env.mjs";
-import { prisma } from "@/server/db";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: DefaultSession["user"] & {
@@ -19,6 +21,7 @@ declare module "next-auth" {
 }
 
 export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
   callbacks: {
     session: ({ session, user }) => ({
       ...session,
@@ -28,7 +31,6 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   },
-  adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
       clientId: env.GOOGLE_CLIENT_ID,
@@ -45,7 +47,7 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-  // debug: process.env.NODE_ENV === "development",
+  debug: process.env.NODE_ENV === "production",
   secret: process.env.NEXTAUTH_SECRET,
 };
 

@@ -248,131 +248,161 @@ const UserProfile = () => {
 
   return (
     <>
-    <div className="flex w-full flex-col font-outfit md:flex-row">
-      <Dialog onOpenChange={getUserData}>
-        {/* Left Side */}
-        <div className="flex w-full flex-col p-0 md:w-[50%] md:p-8">
-          {/* User Photo and Upload */}
-          <div className="mt-6 flex justify-between">
-            <div>
-              <Image
-                src={
-                  userData
-                    ? userData.imageUrl || session?.user.image
-                    : "/user.png"
-                }
-                width={1000}
-                height={1000}
-                className="h-16 w-16 rounded-full md:h-36 md:w-36"
-                alt="User Image"
-              />
-            </div>
-            <div className="flex items-center justify-center">
-              {session?.user ? (
-                <DialogTrigger onClick={() => setTabValue("upload-photo")}>
-                  <Button onClick={() => {}}>Edit</Button>
-                </DialogTrigger>
-              ) : (
-                <Button onClick={() => setShowAuthModal(true)}>Edit</Button>
-              )}
-            </div>
-          </div>
-
-          {/* User Information */}
-          <div className="mt-6">
-            <Card>
-              <div className="flex w-full flex-col gap-y-8">
-                {/* Your Name */}
-                <div className="flex w-full flex-col text-black">
-                  <div className="w-full text-[#1F1F1F] opacity-70">
-                    Your Name
-                  </div>
-                  <div className="flex w-full items-center justify-between">
-                    <div className="flex  items-center justify-center text-lg text-[#000]">
-                      {userData && userData.name ? userData.name : "User"}
-                    </div>
-                    <div className="flex items-center justify-center">
-                      {session?.user ? (
-                        <DialogTrigger onClick={() => setTabValue("edit-name")}>
-                          <Button onClick={() => {}}>Edit</Button>
-                        </DialogTrigger>
-                      ) : (
-                        <Button onClick={() => setShowAuthModal(true)}>
-                          Edit
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                {/* Email */}
-                <div className="flex w-full flex-col text-black">
-                  <div className="w-full text-[#1F1F1F] opacity-70">Email</div>
-                  <div className="flex w-full items-center justify-between">
-                    <div className="flex  items-center justify-center text-lg text-[#000]">
-                      {userData && userData.email
-                        ? userData.email
-                        : "Login to update your E-mail!"}
-                    </div>
-                    <div className="flex items-center justify-center">
-                      {session?.user ? (
-                        <DialogTrigger
-                          onClick={() => setTabValue("edit-email")}
-                        >
-                          <Button onClick={() => {}}>Edit</Button>
-                        </DialogTrigger>
-                      ) : (
-                        <Button onClick={() => setShowAuthModal(true)}>
-                          Edit
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                {/* Phone Number */}
-                <div className="flex w-full flex-col text-black">
-                  <div className="w-full text-[#1F1F1F] opacity-70">
-                    Phone Number
-                  </div>
-                  <div className="flex w-full items-center justify-between">
-                    <div className="flex  items-center justify-center text-lg text-[#000]">
-                      {/* Update Later */}
-                      {userData && userData.phone
-                        ? userData.phone
-                        : "Update after logging."}
-                    </div>
-                    <div className="flex items-center justify-center">
-                      {session?.user ? (
-                        <DialogTrigger
-                          onClick={() => setTabValue("edit-phone")}
-                        >
-                          <Button onClick={() => {}}>Edit</Button>
-                        </DialogTrigger>
-                      ) : (
-                        <Button onClick={() => setShowAuthModal(true)}>
-                          Edit
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </div>
+      <div className="flex w-full flex-col font-outfit md:flex-row">
+        <Dialog onOpenChange={getUserData}>
+          {/* Left Side */}
+          <div className="flex w-full flex-col p-0 md:w-[50%] md:p-8">
+            {/* User Photo and Upload */}
+            <div className="mt-6 flex justify-between">
+              <div>
+                <Image
+                  src={
+                    userData
+                      ? userData.imageUrl || session?.user.image
+                      : "/user.png"
+                  }
+                  width={1000}
+                  height={1000}
+                  className="h-16 w-16 rounded-full md:h-36 md:w-36"
+                  alt="User Image"
+                />
               </div>
-            </Card>
-          </div>
+              <div className="flex items-center justify-center">
+                {session?.user ? (
+                  <DialogTrigger onClick={() => setTabValue("upload-photo")}>
+                    <Button onClick={() => {}}>Edit</Button>
+                  </DialogTrigger>
+                ) : (
+                  <Button onClick={() => setShowAuthModal(true)}>Edit</Button>
+                )}
+              </div>
+            </div>
 
-          {/* About User */}
-          <div className="mt-6">
-            <Card>
-              <div className="flex flex-col ">
-                <div className="flex w-full justify-between">
-                  <div className="text-2xl text-black">
-                    About{" "}
-                    <span className="text-[#413B89]">
-                      {session?.user.name && session?.user.name.split(" ")[0]}
-                    </span>
+            {/* User Information */}
+            <div className="mt-6">
+              <Card>
+                <div className="flex w-full flex-col gap-y-8">
+                  {/* Your Name */}
+                  <div className="flex w-full flex-col text-black">
+                    <div className="w-full text-[#1F1F1F] opacity-70">
+                      Your Name
+                    </div>
+                    <div className="flex w-full items-center justify-between">
+                      <div className="flex  items-center justify-center text-lg text-[#000]">
+                        {userData && userData.name ? userData.name : "User"}
+                      </div>
+                      <div className="flex items-center justify-center">
+                        {session?.user ? (
+                          <DialogTrigger
+                            onClick={() => setTabValue("edit-name")}
+                          >
+                            <Button onClick={() => {}}>Edit</Button>
+                          </DialogTrigger>
+                        ) : (
+                          <Button onClick={() => setShowAuthModal(true)}>
+                            Edit
+                          </Button>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div className="">
+                  {/* Email */}
+                  <div className="flex w-full flex-col text-black">
+                    <div className="w-full text-[#1F1F1F] opacity-70">
+                      Email
+                    </div>
+                    <div className="flex w-full items-center justify-between">
+                      <div className="flex  items-center justify-center text-lg text-[#000]">
+                        {userData && userData.email
+                          ? userData.email
+                          : "Login to update your E-mail!"}
+                      </div>
+                      <div className="flex items-center justify-center">
+                        {session?.user ? (
+                          <DialogTrigger
+                            onClick={() => setTabValue("edit-email")}
+                          >
+                            <Button onClick={() => {}}>Edit</Button>
+                          </DialogTrigger>
+                        ) : (
+                          <Button onClick={() => setShowAuthModal(true)}>
+                            Edit
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  {/* Phone Number */}
+                  <div className="flex w-full flex-col text-black">
+                    <div className="w-full text-[#1F1F1F] opacity-70">
+                      Phone Number
+                    </div>
+                    <div className="flex w-full items-center justify-between">
+                      <div className="flex  items-center justify-center text-lg text-[#000]">
+                        {/* Update Later */}
+                        {userData && userData.phone
+                          ? userData.phone
+                          : "Update after logging."}
+                      </div>
+                      <div className="flex items-center justify-center">
+                        {session?.user ? (
+                          <DialogTrigger
+                            onClick={() => setTabValue("edit-phone")}
+                          >
+                            <Button onClick={() => {}}>Edit</Button>
+                          </DialogTrigger>
+                        ) : (
+                          <Button onClick={() => setShowAuthModal(true)}>
+                            Edit
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* About User */}
+            <div className="mt-6">
+              <Card>
+                <div className="flex flex-col ">
+                  <div className="flex w-full justify-between">
+                    <div className="text-2xl text-black">
+                      About{" "}
+                      <span className="text-[#413B89]">
+                        {session?.user.name && session?.user.name.split(" ")[0]}
+                      </span>
+                    </div>
+                    <div className="">
+                      {session?.user ? (
+                        <DialogTrigger
+                          onClick={() => setTabValue("edit-about")}
+                        >
+                          <Button onClick={() => {}}>Edit</Button>
+                        </DialogTrigger>
+                      ) : (
+                        <Button onClick={() => setShowAuthModal(true)}>
+                          Edit
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="mt-4 text-[#49454F] opacity-80">
+                    {userData?.about || "Update your bio!"}
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* Skills */}
+            <div className="mt-6">
+              <Card>
+                <div className="flex w-full flex-col text-black">
+                  <div className="flex justify-between">
+                    <div className="text-2xl ">Skills</div>
                     {session?.user ? (
-                      <DialogTrigger onClick={() => setTabValue("edit-about")}>
+                      <DialogTrigger onClick={() => setTabValue("edit-skills")}>
                         <Button onClick={() => {}}>Edit</Button>
                       </DialogTrigger>
                     ) : (
@@ -381,58 +411,124 @@ const UserProfile = () => {
                       </Button>
                     )}
                   </div>
-                </div>
-                <div className="mt-4 text-[#49454F] opacity-80">
-                  {userData?.about || "Update your bio!"}
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          {/* Skills */}
-          <div className="mt-6">
-            <Card>
-              <div className="flex w-full flex-col text-black">
-                <div className="flex justify-between">
-                  <div className="text-2xl ">Skills</div>
-                  {session?.user ? (
-                    <DialogTrigger onClick={() => setTabValue("edit-skills")}>
-                      <Button onClick={() => {}}>Edit</Button>
-                    </DialogTrigger>
-                  ) : (
-                    <Button onClick={() => setShowAuthModal(true)}>Edit</Button>
-                  )}
-                </div>
-                <div className="mt-4 flex flex-col">
-                  {userData && userData.skills ? (
-                    userData?.skills?.map((skill: string) => (
-                      <div key={skill} className="text-md opacity-90">
-                        {skill}
+                  <div className="mt-4 flex flex-col">
+                    {userData && userData.skills ? (
+                      userData?.skills?.map((skill: string) => (
+                        <div key={skill} className="text-md opacity-90">
+                          {skill}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-[#49454F] opacity-80">
+                        Update your skills by clicking Edit!
                       </div>
-                    ))
-                  ) : (
-                    <div className="text-[#49454F] opacity-80">
-                      Update your skills by clicking Edit!
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            </div>
           </div>
-        </div>
 
-        {/* Right Side */}
-        <div className="flex w-full flex-col p-0 md:w-[50%] md:p-8">
-          {/* Professional Details */}
-          <div className="mt-6">
-            <Card>
-              <div className="flex w-full items-center justify-center">
-                <div className="flex w-[70%] flex-col">
-                  <div className="flex justify-between text-2xl text-[#222222] opacity-90">
-                    <div>Professional Details</div>
+          {/* Right Side */}
+          <div className="flex w-full flex-col p-0 md:w-[50%] md:p-8">
+            {/* Professional Details */}
+            <div className="mt-6">
+              <Card>
+                <div className="flex w-full items-center justify-center">
+                  <div className="flex w-[70%] flex-col">
+                    <div className="flex justify-between text-2xl text-[#222222] opacity-90">
+                      <div>Professional Details</div>
+                      {session?.user ? (
+                        <DialogTrigger
+                          onClick={() =>
+                            setTabValue("edit-professional-details")
+                          }
+                        >
+                          <Button onClick={() => {}}>Edit</Button>
+                        </DialogTrigger>
+                      ) : (
+                        <Button onClick={() => setShowAuthModal(true)}>
+                          Edit
+                        </Button>
+                      )}
+                    </div>
+                    <div className="mt-2 text-xl text-[#49454F] opacity-80">
+                      {userData?.professionalDetails ||
+                        "Add your professional details here!"}
+                    </div>
+                  </div>
+                  <div className="flex w-[30%] items-center justify-center">
+                    <GiStarsStack color="#2684FC" size={75} stroke="#413B89" />
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* Certifications */}
+            <div className="mt-6">
+              <Card className="border-none pt-0  shadow-none ">
+                <div className="flex w-full flex-col">
+                  <div className="flex justify-between">
+                    <div className="text-2xl text-black">Certifications</div>
                     {session?.user ? (
                       <DialogTrigger
-                        onClick={() => setTabValue("edit-professional-details")}
+                        onClick={() => setTabValue("edit-certifications")}
+                      >
+                        <Button>Edit</Button>
+                      </DialogTrigger>
+                    ) : (
+                      <Button onClick={() => setShowAuthModal(true)}>
+                        Edit
+                      </Button>
+                    )}
+                  </div>
+                  <div className="mt-4">
+                    <Card className="rounded-full">
+                      <div className="flex">
+                        {userData &&
+                        userData.certifications &&
+                        userData.certifications.length > 0 ? (
+                          userData.certifications.map((certificate: any) => (
+                            <div
+                              key={certificate.id}
+                              className="flex w-full items-center"
+                            >
+                              <div className="flex w-1/5 items-center justify-center">
+                                <IoIosMedal color="#FFCE10" size={50} />
+                              </div>
+                              <div className="flex w-4/5 flex-col items-center justify-center text-[#49454F] opacity-80">
+                                <div className="text-3xl ">
+                                  {certificate.course}
+                                </div>
+                                <div className="text-xl">
+                                  {certificate.source}
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="flex w-full items-center justify-center p-4">
+                            <div className="w-4/5 text-xl text-[#49454F] opacity-80">
+                              No certificates at the moment.
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* Experience */}
+            <div className="mt-6">
+              <Card className="border-none pt-0 shadow-none">
+                <div className="flex w-full flex-col">
+                  <div className="flex justify-between">
+                    <div className="text-2xl text-black">Experience</div>
+                    {session?.user ? (
+                      <DialogTrigger
+                        onClick={() => setTabValue("edit-experience")}
                       >
                         <Button onClick={() => {}}>Edit</Button>
                       </DialogTrigger>
@@ -442,574 +538,504 @@ const UserProfile = () => {
                       </Button>
                     )}
                   </div>
-                  <div className="mt-2 text-xl text-[#49454F] opacity-80">
-                    {userData?.professionalDetails ||
-                      "Add your professional details here!"}
+                  <div className="mt-4">
+                    {userData && userData.experience ? (
+                      userData?.experience?.map((experience: any) => (
+                        <Card key={experience.id} className="mb-4">
+                          <div className="flex w-full items-center">
+                            <div className="flex w-[80%] flex-col pr-3">
+                              <div className="flex justify-between text-xl text-[#222222] opacity-90">
+                                <div>{experience.duration}</div>
+                                <div>{experience.employmentType}</div>
+                              </div>
+                              <div className="flex justify-between text-lg text-[#49454F] opacity-80">
+                                <div>{experience.company}</div>
+                                <div>{experience.position}</div>
+                              </div>
+                            </div>
+                            <div className="w-[20%]">
+                              <Image
+                                src="/image 13.png"
+                                width={100}
+                                height={100}
+                                className="h-full w-full"
+                                alt="Company Logo"
+                              />
+                            </div>
+                          </div>
+                        </Card>
+                      ))
+                    ) : (
+                      <div className="text-[#49454F] opacity-80">
+                        You do not possess any Experience.
+                      </div>
+                    )}
                   </div>
                 </div>
-                <div className="flex w-[30%] items-center justify-center">
-                  <GiStarsStack color="#2684FC" size={75} stroke="#413B89" />
-                </div>
-              </div>
-            </Card>
-          </div>
+              </Card>
+            </div>
 
-          {/* Certifications */}
-          <div className="mt-6">
-            <Card className="border-none pt-0  shadow-none ">
-              <div className="flex w-full flex-col">
-                <div className="flex justify-between">
-                  <div className="text-2xl text-black">Certifications</div>
-                  {session?.user ? (
-                    <DialogTrigger
-                      onClick={() => setTabValue("edit-certifications")}
-                    >
-                      <Button>Edit</Button>
-                    </DialogTrigger>
-                  ) : (
-                    <Button onClick={() => setShowAuthModal(true)}>Edit</Button>
-                  )}
-                </div>
-                <div className="mt-4">
-                  <Card className="rounded-full">
-                    <div className="flex">
-                      {userData && userData.certifications.length > 0 ? (
-                        userData.certifications.map((certificate: any) => (
-                          <div
-                            key={certificate.id}
-                            className="flex w-full items-center"
-                          >
-                            <div className="flex w-1/5 items-center justify-center">
-                              <IoIosMedal color="#FFCE10" size={50} />
-                            </div>
-                            <div className="flex w-4/5 flex-col items-center justify-center text-[#49454F] opacity-80">
-                              <div className="text-3xl ">
-                                {certificate.course}
+            {/* Education */}
+            <div className="mt-6">
+              <Card className="border-none pt-0 shadow-none">
+                <div className="flex flex-col">
+                  <div className="flex justify-between">
+                    <div className="text-2xl text-black">Education</div>
+                    {session?.user ? (
+                      <DialogTrigger
+                        onClick={() => setTabValue("edit-education")}
+                      >
+                        <Button onClick={() => {}}>Edit</Button>
+                      </DialogTrigger>
+                    ) : (
+                      <Button onClick={() => setShowAuthModal(true)}>
+                        Edit
+                      </Button>
+                    )}
+                  </div>
+                  <div className="mt-4">
+                    {userData && userData.education ? (
+                      userData?.education?.map((education: any) => (
+                        <Card key={education.id} className="mb-4">
+                          <div className="flex flex-col">
+                            <div className="flex items-end justify-between p-1 pr-4 text-xl text-black opacity-90">
+                              <div className="text-3xl text-[#413B89]">
+                                {education.institute}
                               </div>
-                              <div className="text-xl">
-                                {certificate.source}
-                              </div>
+                              <div className="">{education.course}</div>
+                            </div>
+                            <div className="text-[#49454F] opacity-80">
+                              {education.description}
                             </div>
                           </div>
-                        ))
-                      ) : (
-                        <div className="flex w-full items-center justify-center p-4">
-                          <div className="w-4/5 text-xl text-[#49454F] opacity-80">
-                            No certificates at the moment.
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </Card>
+                        </Card>
+                      ))
+                    ) : (
+                      <div className="text-[#49454F] opacity-80">
+                        Login to update your education data.
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            </div>
           </div>
 
-          {/* Experience */}
-          <div className="mt-6">
-            <Card className="border-none pt-0 shadow-none">
-              <div className="flex w-full flex-col">
-                <div className="flex justify-between">
-                  <div className="text-2xl text-black">Experience</div>
-                  {session?.user ? (
-                    <DialogTrigger
-                      onClick={() => setTabValue("edit-experience")}
-                    >
-                      <Button onClick={() => {}}>Edit</Button>
-                    </DialogTrigger>
-                  ) : (
-                    <Button onClick={() => setShowAuthModal(true)}>Edit</Button>
-                  )}
-                </div>
-                <div className="mt-4">
-                  {userData && userData.experience ? (
-                    userData?.experience?.map((experience: any) => (
-                      <Card key={experience.id} className="mb-4">
-                        <div className="flex w-full items-center">
-                          <div className="flex w-[80%] flex-col pr-3">
-                            <div className="flex justify-between text-xl text-[#222222] opacity-90">
-                              <div>{experience.duration}</div>
-                              <div>{experience.employmentType}</div>
-                            </div>
-                            <div className="flex justify-between text-lg text-[#49454F] opacity-80">
-                              <div>{experience.company}</div>
-                              <div>{experience.position}</div>
-                            </div>
-                          </div>
-                          <div className="w-[20%]">
-                            <Image
-                              src="/image 13.png"
-                              width={100}
-                              height={100}
-                              className="h-full w-full"
-                              alt="Company Logo"
-                            />
-                          </div>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Update your details</DialogTitle>
+            </DialogHeader>
+            <Tabs defaultValue={tabValue} className="w-full">
+              <TabsContent
+                value="upload-photo"
+                className="flex w-full flex-col items-center justify-center"
+              >
+                <Input
+                  type="text"
+                  value={userDetails.imageUrl}
+                  placeholder="Your Name"
+                  onChange={(event) =>
+                    setUserDetails({
+                      ...userDetails,
+                      imageUrl: event.target.value,
+                    })
+                  }
+                />
+                <Button
+                  variant="destructive"
+                  className="mt-2"
+                  onClick={updateUserData}
+                >
+                  Upload Image
+                </Button>
+              </TabsContent>
+              <TabsContent
+                value="edit-name"
+                className="flex w-full flex-col items-center justify-center"
+              >
+                <Input
+                  type="text"
+                  value={userDetails.name}
+                  placeholder="Your Name"
+                  onChange={(event) =>
+                    setUserDetails({ ...userDetails, name: event.target.value })
+                  }
+                />
+                <Button
+                  variant="destructive"
+                  className="mt-2"
+                  onClick={updateUserData}
+                >
+                  Update Name
+                </Button>
+              </TabsContent>
+              <TabsContent
+                value="edit-email"
+                className="flex w-full flex-col items-center justify-center"
+              >
+                <Input
+                  type="text"
+                  value={userDetails.email}
+                  placeholder="Your Email"
+                  onChange={(event) =>
+                    setUserDetails({
+                      ...userDetails,
+                      email: event.target.value,
+                    })
+                  }
+                />
+                <Button
+                  variant="destructive"
+                  className="mt-2"
+                  onClick={updateUserData}
+                >
+                  Update Email
+                </Button>
+              </TabsContent>
+              <TabsContent
+                value="edit-phone"
+                className="flex w-full flex-col items-center justify-center"
+              >
+                <Input
+                  type="text"
+                  value={userDetails.phone}
+                  placeholder="Your Phone"
+                  onChange={(event) =>
+                    setUserDetails({
+                      ...userDetails,
+                      phone: event.target.value,
+                    })
+                  }
+                />
+                <Button
+                  variant="destructive"
+                  className="mt-2"
+                  onClick={updateUserData}
+                >
+                  Update Phone Number
+                </Button>
+              </TabsContent>
+              <TabsContent
+                value="edit-about"
+                className="flex w-full flex-col items-center justify-center"
+              >
+                <Input
+                  type="text"
+                  value={userDetails.about}
+                  placeholder="Tell everyone about you!"
+                  onChange={(event) =>
+                    setUserDetails({
+                      ...userDetails,
+                      about: event.target.value,
+                    })
+                  }
+                />
+                <Button
+                  variant="destructive"
+                  className="mt-2"
+                  onClick={updateUserData}
+                >
+                  Update About Section
+                </Button>
+              </TabsContent>
+              <TabsContent
+                value="edit-skills"
+                className="flex w-full flex-col items-center justify-center"
+              >
+                <div className="flex flex-wrap items-center justify-center">
+                  Your Skills:
+                  {userDetails.skills &&
+                    userDetails.skills.map((skill: any, index: any) => (
+                      <div
+                        key={index}
+                        className="mb-2 flex items-center justify-center"
+                        style={{
+                          maxWidth: "150px",
+                        }}
+                      >
+                        <div className="ml-2 rounded-lg bg-muted p-1">
+                          {skill}
                         </div>
-                      </Card>
-                    ))
-                  ) : (
-                    <div className="text-[#49454F] opacity-80">
-                      You do not possess any Experience.
-                    </div>
-                  )}
+                      </div>
+                    ))}
                 </div>
-              </div>
-            </Card>
-          </div>
-
-          {/* Education */}
-          <div className="mt-6">
-            <Card className="border-none pt-0 shadow-none">
-              <div className="flex flex-col">
-                <div className="flex justify-between">
-                  <div className="text-2xl text-black">Education</div>
-                  {session?.user ? (
-                    <DialogTrigger
-                      onClick={() => setTabValue("edit-education")}
-                    >
-                      <Button onClick={() => {}}>Edit</Button>
-                    </DialogTrigger>
-                  ) : (
-                    <Button onClick={() => setShowAuthModal(true)}>Edit</Button>
-                  )}
-                </div>
-                <div className="mt-4">
-                  {userData && userData.education ? (
-                    userData?.education?.map((education: any) => (
-                      <Card key={education.id} className="mb-4">
-                        <div className="flex flex-col">
-                          <div className="flex items-end justify-between p-1 pr-4 text-xl text-black opacity-90">
-                            <div className="text-3xl text-[#413B89]">
-                              {education.institute}
-                            </div>
-                            <div className="">{education.course}</div>
-                          </div>
-                          <div className="text-[#49454F] opacity-80">
-                            {education.description}
-                          </div>
-                        </div>
-                      </Card>
-                    ))
-                  ) : (
-                    <div className="text-[#49454F] opacity-80">
-                      Login to update your education data.
-                    </div>
-                  )}
-                </div>
-              </div>
-            </Card>
-          </div>
-        </div>
-
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Update your details</DialogTitle>
-          </DialogHeader>
-          <Tabs defaultValue={tabValue} className="w-full">
-            <TabsContent
-              value="upload-photo"
-              className="flex w-full flex-col items-center justify-center"
-            >
-              <Input
-                type="text"
-                value={userDetails.imageUrl}
-                placeholder="Your Name"
-                onChange={(event) =>
-                  setUserDetails({
-                    ...userDetails,
-                    imageUrl: event.target.value,
-                  })
-                }
-              />
-              <Button
-                variant="destructive"
-                className="mt-2"
-                onClick={updateUserData}
+                <Input
+                  type="text"
+                  value={newSkill}
+                  placeholder="Add a new skill"
+                  onChange={(event) => setNewSkill(event.target.value)}
+                />
+                <Button
+                  variant="ghost"
+                  className="mt-2 bg-[#f1f5f9]"
+                  onClick={() => {
+                    if (newSkill) {
+                      setUserDetails({
+                        ...userDetails,
+                        skills: [...userDetails.skills, newSkill],
+                      });
+                      setNewSkill("");
+                    }
+                  }}
+                >
+                  Add Skill
+                </Button>
+                <Button
+                  variant="destructive"
+                  className="mt-2"
+                  onClick={updateUserData}
+                >
+                  Update All Skills
+                </Button>
+              </TabsContent>
+              <TabsContent
+                value="edit-professional-details"
+                className="flex w-full flex-col items-center justify-center"
               >
-                Upload Image
-              </Button>
-            </TabsContent>
-            <TabsContent
-              value="edit-name"
-              className="flex w-full flex-col items-center justify-center"
-            >
-              <Input
-                type="text"
-                value={userDetails.name}
-                placeholder="Your Name"
-                onChange={(event) =>
-                  setUserDetails({ ...userDetails, name: event.target.value })
-                }
-              />
-              <Button
-                variant="destructive"
-                className="mt-2"
-                onClick={updateUserData}
+                <Input
+                  type="text"
+                  value={userDetails.professionalDetails}
+                  placeholder="Your Professional Details"
+                  onChange={(event) =>
+                    setUserDetails({
+                      ...userDetails,
+                      professionalDetails: event.target.value,
+                    })
+                  }
+                />
+                <Button
+                  variant="destructive"
+                  className="mt-2"
+                  onClick={updateUserData}
+                >
+                  Update Professional Details
+                </Button>
+              </TabsContent>
+              <TabsContent
+                value="edit-certifications"
+                className="flex w-full flex-col items-center justify-center"
               >
-                Update Name
-              </Button>
-            </TabsContent>
-            <TabsContent
-              value="edit-email"
-              className="flex w-full flex-col items-center justify-center"
-            >
-              <Input
-                type="text"
-                value={userDetails.email}
-                placeholder="Your Email"
-                onChange={(event) =>
-                  setUserDetails({ ...userDetails, email: event.target.value })
-                }
-              />
-              <Button
-                variant="destructive"
-                className="mt-2"
-                onClick={updateUserData}
-              >
-                Update Email
-              </Button>
-            </TabsContent>
-            <TabsContent
-              value="edit-phone"
-              className="flex w-full flex-col items-center justify-center"
-            >
-              <Input
-                type="text"
-                value={userDetails.phone}
-                placeholder="Your Phone"
-                onChange={(event) =>
-                  setUserDetails({ ...userDetails, phone: event.target.value })
-                }
-              />
-              <Button
-                variant="destructive"
-                className="mt-2"
-                onClick={updateUserData}
-              >
-                Update Phone Number
-              </Button>
-            </TabsContent>
-            <TabsContent
-              value="edit-about"
-              className="flex w-full flex-col items-center justify-center"
-            >
-              <Input
-                type="text"
-                value={userDetails.about}
-                placeholder="Tell everyone about you!"
-                onChange={(event) =>
-                  setUserDetails({ ...userDetails, about: event.target.value })
-                }
-              />
-              <Button
-                variant="destructive"
-                className="mt-2"
-                onClick={updateUserData}
-              >
-                Update About Section
-              </Button>
-            </TabsContent>
-            <TabsContent
-              value="edit-skills"
-              className="flex w-full flex-col items-center justify-center"
-            >
-              <div className="flex flex-wrap items-center justify-center">
-                Your Skills:
-                {userDetails.skills &&
-                  userDetails.skills.map((skill: any, index: any) => (
+                <div className="flex w-full flex-col space-y-4">
+                  {certificationsArray.map((cert: any, index: any) => (
                     <div
                       key={index}
-                      className="mb-2 flex items-center justify-center"
-                      style={{
-                        maxWidth: "150px",
-                      }}
+                      className="flex flex-col items-center justify-center gap-2"
                     >
-                      <div className="ml-2 rounded-lg bg-muted p-1">
-                        {skill}
+                      <div className="flex-1">
+                        <Input
+                          type="text"
+                          placeholder="Course"
+                          value={cert.course}
+                          onChange={(event) => {
+                            const updatedCertificationsArray = [
+                              ...certificationsArray,
+                            ];
+                            updatedCertificationsArray[index].course =
+                              event.target.value;
+                            setCertificationsArray(updatedCertificationsArray);
+                          }}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <Input
+                          type="text"
+                          placeholder="Source"
+                          value={cert.source}
+                          onChange={(event) => {
+                            const updatedCertificationsArray = [
+                              ...certificationsArray,
+                            ];
+                            updatedCertificationsArray[index].source =
+                              event.target.value;
+                            setCertificationsArray(updatedCertificationsArray);
+                          }}
+                        />
                       </div>
                     </div>
                   ))}
-              </div>
-              <Input
-                type="text"
-                value={newSkill}
-                placeholder="Add a new skill"
-                onChange={(event) => setNewSkill(event.target.value)}
-              />
-              <Button
-                variant="ghost"
-                className="mt-2 bg-[#f1f5f9]"
-                onClick={() => {
-                  if (newSkill) {
-                    setUserDetails({
-                      ...userDetails,
-                      skills: [...userDetails.skills, newSkill],
-                    });
-                    setNewSkill("");
-                  }
-                }}
-              >
-                Add Skill
-              </Button>
-              <Button
-                variant="destructive"
-                className="mt-2"
-                onClick={updateUserData}
-              >
-                Update All Skills
-              </Button>
-            </TabsContent>
-            <TabsContent
-              value="edit-professional-details"
-              className="flex w-full flex-col items-center justify-center"
-            >
-              <Input
-                type="text"
-                value={userDetails.professionalDetails}
-                placeholder="Your Professional Details"
-                onChange={(event) =>
-                  setUserDetails({
-                    ...userDetails,
-                    professionalDetails: event.target.value,
-                  })
-                }
-              />
-              <Button
-                variant="destructive"
-                className="mt-2"
-                onClick={updateUserData}
-              >
-                Update Professional Details
-              </Button>
-            </TabsContent>
-            <TabsContent
-              value="edit-certifications"
-              className="flex w-full flex-col items-center justify-center"
-            >
-              <div className="flex w-full flex-col space-y-4">
-                {certificationsArray.map((cert: any, index: any) => (
-                  <div
-                    key={index}
-                    className="flex flex-col items-center justify-center gap-2"
+                  <Button
+                    onClick={() =>
+                      setCertificationsArray([
+                        ...certificationsArray,
+                        { course: "", source: "" },
+                      ])
+                    }
                   >
-                    <div className="flex-1">
-                      <Input
-                        type="text"
-                        placeholder="Course"
-                        value={cert.course}
-                        onChange={(event) => {
-                          const updatedCertificationsArray = [
-                            ...certificationsArray,
-                          ];
-                          updatedCertificationsArray[index].course =
-                            event.target.value;
-                          setCertificationsArray(updatedCertificationsArray);
-                        }}
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <Input
-                        type="text"
-                        placeholder="Source"
-                        value={cert.source}
-                        onChange={(event) => {
-                          const updatedCertificationsArray = [
-                            ...certificationsArray,
-                          ];
-                          updatedCertificationsArray[index].source =
-                            event.target.value;
-                          setCertificationsArray(updatedCertificationsArray);
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
-                <Button
-                  onClick={() =>
-                    setCertificationsArray([
-                      ...certificationsArray,
-                      { course: "", source: "" },
-                    ])
-                  }
-                >
-                  Add Certification
-                </Button>
-                <Button
-                  variant="destructive"
-                  className="mt-2"
-                  onClick={updateUserData}
-                >
-                  Update Certifications
-                </Button>
-              </div>
-            </TabsContent>
+                    Add Certification
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="mt-2"
+                    onClick={updateUserData}
+                  >
+                    Update Certifications
+                  </Button>
+                </div>
+              </TabsContent>
 
-            <TabsContent
-              value="edit-experience"
-              className="flex w-full flex-col items-center justify-center"
-            >
-              <div className="flex w-full flex-col space-y-4">
-                {experienceArray.map((exp: any, index: any) => (
-                  <div
-                    key={index}
-                    className="flex flex-col items-center justify-center gap-2"
+              <TabsContent
+                value="edit-experience"
+                className="flex w-full flex-col items-center justify-center"
+              >
+                <div className="flex w-full flex-col space-y-4">
+                  {experienceArray.map((exp: any, index: any) => (
+                    <div
+                      key={index}
+                      className="flex flex-col items-center justify-center gap-2"
+                    >
+                      <div className="flex-1">
+                        <Input
+                          type="text"
+                          placeholder="Company"
+                          value={exp.company}
+                          onChange={(event) => {
+                            const updatedExperienceArray = [...experienceArray];
+                            updatedExperienceArray[index].company =
+                              event.target.value;
+                            setExperienceArray(updatedExperienceArray);
+                          }}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <Input
+                          type="text"
+                          placeholder="Position"
+                          value={exp.position}
+                          onChange={(event) => {
+                            const updatedExperienceArray = [...experienceArray];
+                            updatedExperienceArray[index].position =
+                              event.target.value;
+                            setExperienceArray(updatedExperienceArray);
+                          }}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <Input
+                          type="text"
+                          placeholder="Duration"
+                          value={exp.duration}
+                          onChange={(event) => {
+                            const updatedExperienceArray = [...experienceArray];
+                            updatedExperienceArray[index].duration =
+                              event.target.value;
+                            setExperienceArray(updatedExperienceArray);
+                          }}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <select
+                          value={exp.employmentType}
+                          onChange={(event) => {
+                            const updatedExperienceArray = [...experienceArray];
+                            updatedExperienceArray[index].employmentType =
+                              event.target.value;
+                            setExperienceArray(updatedExperienceArray);
+                          }}
+                          className="rounded-lg border-2 bg-none p-1"
+                        >
+                          <option value="">Select Employment Type</option>
+                          <option value="internship">Internship</option>
+                          <option value="job">Job</option>
+                          <option value="contract">Contract</option>
+                        </select>
+                      </div>
+                    </div>
+                  ))}
+                  <Button
+                    onClick={() =>
+                      setExperienceArray([
+                        ...experienceArray,
+                        { company: "", position: "" },
+                      ])
+                    }
                   >
-                    <div className="flex-1">
-                      <Input
-                        type="text"
-                        placeholder="Company"
-                        value={exp.company}
-                        onChange={(event) => {
-                          const updatedExperienceArray = [...experienceArray];
-                          updatedExperienceArray[index].company =
-                            event.target.value;
-                          setExperienceArray(updatedExperienceArray);
-                        }}
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <Input
-                        type="text"
-                        placeholder="Position"
-                        value={exp.position}
-                        onChange={(event) => {
-                          const updatedExperienceArray = [...experienceArray];
-                          updatedExperienceArray[index].position =
-                            event.target.value;
-                          setExperienceArray(updatedExperienceArray);
-                        }}
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <Input
-                        type="text"
-                        placeholder="Duration"
-                        value={exp.duration}
-                        onChange={(event) => {
-                          const updatedExperienceArray = [...experienceArray];
-                          updatedExperienceArray[index].duration =
-                            event.target.value;
-                          setExperienceArray(updatedExperienceArray);
-                        }}
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <select
-                        value={exp.employmentType}
-                        onChange={(event) => {
-                          const updatedExperienceArray = [...experienceArray];
-                          updatedExperienceArray[index].employmentType =
-                            event.target.value;
-                          setExperienceArray(updatedExperienceArray);
-                        }}
-                        className="rounded-lg border-2 bg-none p-1"
-                      >
-                        <option value="">Select Employment Type</option>
-                        <option value="internship">Internship</option>
-                        <option value="job">Job</option>
-                        <option value="contract">Contract</option>
-                      </select>
-                    </div>
-                  </div>
-                ))}
-                <Button
-                  onClick={() =>
-                    setExperienceArray([
-                      ...experienceArray,
-                      { company: "", position: "" },
-                    ])
-                  }
-                >
-                  Add Experience
-                </Button>
-                <Button
-                  variant="destructive"
-                  className="mt-2"
-                  onClick={updateUserData}
-                >
-                  Update Experience
-                </Button>
-              </div>
-            </TabsContent>
-            <TabsContent
-              value="edit-education"
-              className="flex w-full flex-col items-center justify-center"
-            >
-              <div className="flex w-full flex-col space-y-4">
-                {educationArray.map((edu: any, index: any) => (
-                  <div
-                    key={index}
-                    className="flex flex-col items-center justify-center gap-2"
+                    Add Experience
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="mt-2"
+                    onClick={updateUserData}
                   >
-                    <div className="flex-1">
-                      <Input
-                        type="text"
-                        placeholder="Institute"
-                        value={edu.institute}
-                        onChange={(event) => {
-                          const updatedEducationArray = [...educationArray];
-                          updatedEducationArray[index].institute =
-                            event.target.value;
-                          setEducationArray(updatedEducationArray);
-                        }}
-                      />
+                    Update Experience
+                  </Button>
+                </div>
+              </TabsContent>
+              <TabsContent
+                value="edit-education"
+                className="flex w-full flex-col items-center justify-center"
+              >
+                <div className="flex w-full flex-col space-y-4">
+                  {educationArray.map((edu: any, index: any) => (
+                    <div
+                      key={index}
+                      className="flex flex-col items-center justify-center gap-2"
+                    >
+                      <div className="flex-1">
+                        <Input
+                          type="text"
+                          placeholder="Institute"
+                          value={edu.institute}
+                          onChange={(event) => {
+                            const updatedEducationArray = [...educationArray];
+                            updatedEducationArray[index].institute =
+                              event.target.value;
+                            setEducationArray(updatedEducationArray);
+                          }}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <Input
+                          type="text"
+                          placeholder="Course"
+                          value={edu.course}
+                          onChange={(event) => {
+                            const updatedEducationArray = [...educationArray];
+                            updatedEducationArray[index].course =
+                              event.target.value;
+                            setEducationArray(updatedEducationArray);
+                          }}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <Input
+                          type="text"
+                          placeholder="Description"
+                          value={edu.description}
+                          onChange={(event) => {
+                            const updatedEducationArray = [...educationArray];
+                            updatedEducationArray[index].description =
+                              event.target.value;
+                            setEducationArray(updatedEducationArray);
+                          }}
+                        />
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <Input
-                        type="text"
-                        placeholder="Course"
-                        value={edu.course}
-                        onChange={(event) => {
-                          const updatedEducationArray = [...educationArray];
-                          updatedEducationArray[index].course =
-                            event.target.value;
-                          setEducationArray(updatedEducationArray);
-                        }}
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <Input
-                        type="text"
-                        placeholder="Description"
-                        value={edu.description}
-                        onChange={(event) => {
-                          const updatedEducationArray = [...educationArray];
-                          updatedEducationArray[index].description =
-                            event.target.value;
-                          setEducationArray(updatedEducationArray);
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
-                <Button
-                  onClick={() =>
-                    setEducationArray([
-                      ...educationArray,
-                      { institute: "", course: "", description: "" },
-                    ])
-                  }
-                >
-                  Add Education
-                </Button>
-                <Button
-                  variant="destructive"
-                  className="mt-2"
-                  onClick={updateUserData}
-                >
-                  Update Education
-                </Button>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </DialogContent>
-      </Dialog>
-    </div>
-    {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+                  ))}
+                  <Button
+                    onClick={() =>
+                      setEducationArray([
+                        ...educationArray,
+                        { institute: "", course: "", description: "" },
+                      ])
+                    }
+                  >
+                    Add Education
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="mt-2"
+                    onClick={updateUserData}
+                  >
+                    Update Education
+                  </Button>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </DialogContent>
+        </Dialog>
+      </div>
+      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
     </>
-
   );
 };
 
