@@ -20,6 +20,11 @@ export default async function handler(
         where: {
           email: emailID,
         },
+        include: {
+          certifications: true,
+          experience: true,
+          education: true,
+        },
       });
 
       if (user) {

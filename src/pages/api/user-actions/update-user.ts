@@ -14,13 +14,13 @@ export default async function handler(
     about,
     skills,
     professionalDetails,
-    certifications,
-    experience,
-    education,
+    certificationsArray,
+    experienceArray,
+    educationArray,
     connections,
   } = await req.body;
 
-  console.log(" ~!*&!~ ", emailID);
+  console.log("certificates", certificationsArray);
 
   if (emailID) {
     const user = await prisma.user.findUnique({
@@ -28,10 +28,11 @@ export default async function handler(
         email: emailID,
       },
       include: {
-        certifications,
+        experience: true,
+        certifications: true,
+        education: true,
       },
     });
-
     if (user) {
       const updateData: any = {};
       const updatedFields: any = {};
@@ -65,27 +66,57 @@ export default async function handler(
         updatedFields.professionalDetails = professionalDetails;
       }
 
-      if (certifications.length > 0) {
-        const userCertifications = user.certifications || [];
-        const mergedCertifications = [...userCertifications, ...certifications];
+      if (educationArray) {
+        const userEducation = user.education || [];
+        const sanitizedEducationArray = educationArray.map(
+          ({ ...rest }) => rest
+        );
+        const mergedEducation = [...userEducation, ...sanitizedEducationArray];
 
-        updateData.certifications = mergedCertifications;
-        updatedFields.certifications = mergedCertifications;
-      }
+        updateData.education = {
+          create: sanitizedEducationArray,
+        };
 
-      if (experience.length > 0) {
-        updateData.experience = experience;
-        updatedFields.experience = experience;
-      }
-
-      if (education.length > 0) {
-        updateData.education = education;
-        updatedFields.education = education;
+        updatedFields.education = mergedEducation;
       }
 
       if (connections.length > 0) {
         updateData.connections = connections;
         updatedFields.connections = connections;
+      }
+
+      if (experienceArray) {
+        const userExperience = user.experience || [];
+        const sanitizedExperienceArray = experienceArray.map(
+          ({ ...rest }) => rest
+        );
+        const mergedExperience = [
+          ...userExperience,
+          ...sanitizedExperienceArray,
+        ];
+
+        updateData.experience = {
+          create: sanitizedExperienceArray,
+        };
+
+        updatedFields.experience = mergedExperience;
+      }
+
+      if (certificationsArray) {
+        const userCertifications = user.certifications || [];
+        const sanitizedCertificationsArray = certificationsArray.map(
+          ({ ...rest }) => rest
+        );
+        const mergedCertifications = [
+          ...userCertifications,
+          ...sanitizedCertificationsArray,
+        ];
+
+        updateData.certifications = {
+          create: sanitizedCertificationsArray,
+        };
+
+        updatedFields.certifications = mergedCertifications;
       }
 
       if (Object.keys(updateData).length > 0) {
@@ -101,7 +132,9 @@ export default async function handler(
             email: emailID,
           },
           include: {
-            certifications,
+            certifications: true,
+            education: true,
+            experience: true,
           },
         });
         await redis.set(emailID, JSON.stringify(userCache));

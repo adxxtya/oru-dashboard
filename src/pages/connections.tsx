@@ -1,8 +1,12 @@
-import UserCard from "@/components/Card/UserCard";
+import AuthModal from "@/components/Modal/AuthModal";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/use-toast";
 import { type User } from "@prisma/client";
 import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import { useEffect, useState } from "react";
+import { twMerge } from "tailwind-merge";
 
 interface ConnectionsProps {}
 
@@ -15,10 +19,16 @@ const Connections: React.FC<ConnectionsProps> = ({}) => {
 
   const [userConnections, setUserConnections] = useState<any>([]);
   const [allUsers, setAllUsers] = useState<any>();
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
     setSessionState(session);
   }, [session]);
+
+  let myEmail: string;
+  if (session?.user.email) {
+    myEmail = session?.user.email;
+  }
 
   async function getAllUsers() {
     const response = await fetch(
@@ -34,8 +44,6 @@ const Connections: React.FC<ConnectionsProps> = ({}) => {
       setMyData(myUser);
     }
   }
-
-  console.log("all", allUsers);
 
   async function getUserConnections() {
     if (session?.user.email) {
@@ -58,6 +66,75 @@ const Connections: React.FC<ConnectionsProps> = ({}) => {
     }
   }
 
+  const addConnection = async (email: any) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/user-actions/add-connection`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            myEmail: myEmail,
+            userEmail: email,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        getAllUsers();
+        setUserConnections([...userConnections, email]);
+        setAllUsers([...allUsers]);
+        toast({
+          title: `You both are now connected :)`,
+          description: `You are added as friend in their connections too.`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: `Error!`,
+        description: `${error}`,
+      });
+      console.error("Error adding connection:", error);
+    }
+  };
+
+  const removeConnection = async (email: any) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/user-actions/remove-connection`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            myEmail: myEmail,
+            userEmail: email,
+          }),
+        }
+      );
+      if (response.ok) {
+        getAllUsers();
+        toast({
+          title: `You both got disconnected :(`,
+          description: `You were removed from their connections too.`,
+        });
+        setUserConnections(
+          userConnections.filter((connection: any) => connection !== email)
+        );
+        setAllUsers([...allUsers]);
+      }
+    } catch (error) {
+      console.error("Error removing connection:", error);
+      toast({
+        title: `Error!`,
+        description: `${error}`,
+      });
+    }
+  };
+
   useEffect(() => {
     getAllUsers();
     getUserConnections();
@@ -73,61 +150,189 @@ const Connections: React.FC<ConnectionsProps> = ({}) => {
   }
 
   return (
-    <div className="relative flex w-full flex-col items-center justify-center bg-[#FAFBFF] pb-16">
-      <div className="mt-12 h-24 w-[98%] rounded-lg bg-[#1E2875] p-6 text-white">
-        <div className="mb-14 w-full text-xl">MY CONNECTIONS</div>
-      </div>
-
-      <div className="mt-12 flex w-full flex-col">
-        {/* Current Connections */}
-        <div className="ml-4 flex flex-col">
-          <div className="text-3xl text-black">Your Current Connections</div>
-          <div className="mt-6 flex flex-wrap gap-4">
-            <UserCard
-              name="Aditya Maurya"
-              company="Google"
-              connection={true}
-              position="Full Stack"
-              // userImage={decodeURIComponent(
-              //   "https%3A%2F%2Flh3.googleusercontent.com%2Fa%2FAAcHTtdOCskmKOYzVrT7NS3on5mZ331_7a0gxsgkE5Qjch3H%3Ds96-c&w=1080&q=100"
-              // )}
-            />
-          </div>
+    <>
+      <div className="relative flex w-full flex-col items-center justify-center bg-[#FAFBFF] pb-16">
+        <div className="mt-12 h-24 w-[98%] rounded-lg bg-[#1E2875] p-6 text-white">
+          <div className="mb-14 w-full text-xl">MY CONNECTIONS</div>
         </div>
 
-        {/* New Connections */}
-        <div className="ml-4 mt-12 flex flex-col">
-          <div className="text-3xl text-black">People You Can Also Connect</div>
-          <div className="mt-6 flex flex-wrap gap-4">
-            {allUsers && allUsers.length > 0 ? (
-              <>
-                {allUsers.map((user: any) => {
-                  const isUserConnected = userConnections.includes(user.email); // Check if the user's email is in userConnections
-
-                  if (!isUserConnected) {
-                    return (
-                      <UserCard
-                        key={user.id}
-                        name={user.name}
-                        email={user.email}
-                        company={user.company}
-                        position={user.position}
-                        userImage={user.image}
-                        connection={isUserConnected}
-                      />
+        <div className="mt-12 flex w-full flex-col">
+          {/* Current Connections */}
+          <div className="ml-4 flex flex-col">
+            <div className="text-3xl text-black">Your Current Connections</div>
+            <div className="mt-6 flex flex-wrap gap-4">
+              {allUsers && userConnections && userConnections.length > 0 ? (
+                <>
+                  {userConnections.map((connectedEmail: string) => {
+                    const connectedUser = allUsers.find(
+                      (user: any) => user.email === connectedEmail
                     );
-                  }
 
-                  return null;
-                })}
-              </>
-            ) : (
-              <div>No users on the platform</div>
-            )}
+                    if (connectedUser) {
+                      return (
+                        <>
+                          <div
+                            className={twMerge(
+                              "h-auto w-[400px] rounded-xl border-2 border-[#00000040] p-4 shadow-sm"
+                            )}
+                          >
+                            <div className="flex h-full w-full ">
+                              <div className="flex w-full flex-col items-center justify-center space-y-2 p-2">
+                                <div className="w-full text-left text-xl">
+                                  {connectedUser.name}
+                                </div>
+
+                                <div className="w-full">
+                                  {session?.user ? (
+                                    <Button
+                                      className="mt-2 bg-[#BAB6EB] text-xs text-black"
+                                      onClick={() =>
+                                        removeConnection(connectedUser.email)
+                                      }
+                                    >
+                                      Disconnect
+                                    </Button>
+                                  ) : (
+                                    <Button
+                                      onClick={() => setShowAuthModal(true)}
+                                    >
+                                      Disconnect
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="w-[80%]">
+                                <Image
+                                  src={connectedUser.image || "/user.png"}
+                                  width={1000}
+                                  height={1000}
+                                  className="h-36 w-36 rounded-full object-contain"
+                                  alt="User Image"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </>
+                      );
+                    }
+
+                    return null;
+                  })}
+                </>
+              ) : (
+                <div className="flex h-52 w-full flex-col items-center justify-center bg-[##FFFFFF] text-center text-gray-500">
+                  <svg
+                    className="mx-auto h-12 w-12 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
+                    />
+                  </svg>
+                  <p className="mt-2">You have no connections yet.</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* New Connections */}
+          <div className="ml-4 mt-12 flex flex-col">
+            <div className="text-3xl text-black">
+              People You Can Also Connect
+            </div>
+            <div className="mt-6 flex flex-wrap gap-4">
+              {allUsers && allUsers.length > 0 ? (
+                <>
+                  {allUsers.map((user: any) => {
+                    const isUserConnected = userConnections.includes(
+                      user.email
+                    );
+
+                    if (
+                      !isUserConnected &&
+                      user.email !== session?.user.email
+                    ) {
+                      return (
+                        <>
+                          <div
+                            className={twMerge(
+                              "h-auto w-[400px] rounded-xl border-2 border-[#00000040] p-4 shadow-sm"
+                            )}
+                          >
+                            <div className="flex h-full w-full ">
+                              <div className="flex w-full flex-col items-center justify-center space-y-2 p-2">
+                                <div className="w-full text-left text-xl">
+                                  {user.name}
+                                </div>
+
+                                <div className="w-full">
+                                  {session?.user ? (
+                                    <Button
+                                      className="mt-2 bg-[#BAB6EB] text-xs text-black"
+                                      onClick={() => addConnection(user.email)}
+                                    >
+                                      Connect
+                                    </Button>
+                                  ) : (
+                                    <Button
+                                      onClick={() => setShowAuthModal(true)}
+                                    >
+                                      Connect
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="w-[80%]">
+                                <Image
+                                  src={user.image || "/user.png"}
+                                  width={1000}
+                                  height={1000}
+                                  className="h-36 w-36 rounded-full object-contain"
+                                  alt="User Image"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </>
+                      );
+                    }
+
+                    return null;
+                  })}
+                </>
+              ) : (
+                <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 py-12 sm:px-6 lg:px-8">
+                  <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-md">
+                    <svg
+                      className="mx-auto h-12 w-12 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
+                      />
+                    </svg>
+                    <p className="mt-4 text-center text-lg text-gray-500">
+                      No users on the platform
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+    </>
   );
 };
 

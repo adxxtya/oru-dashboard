@@ -12,14 +12,8 @@ const buttonVariants = cva(
         default: "bg-[#F0EFFA] text-[#1F1F1F] opacity-70 hover:opacity-50",
         destructive:
           "bg-[#1e2875] text-destructive-foreground hover:bg-[#1e2875]/60",
-        outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
       },
-      // {/* <button className="flex w-auto items-center justify-center rounded-full bg-[#F0EFFA] px-5 py-1 text-[#1F1F1F]  opacity-70">
 
       size: {
         default: "h-auto px-5 py-1",
@@ -44,6 +38,7 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
+
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}

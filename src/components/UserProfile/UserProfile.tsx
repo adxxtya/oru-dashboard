@@ -12,10 +12,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "../ui/use-toast";
 import { Tabs, TabsContent } from "@radix-ui/react-tabs";
 import { Input } from "../ui/input";
 import { type Session } from "next-auth/core/types";
+import AuthModal from "../Modal/AuthModal";
 
 const UserProfile = () => {
   let emailID;
@@ -46,7 +54,10 @@ const UserProfile = () => {
     connections: [],
     imageUrl: "",
   });
-
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [experienceArray, setExperienceArray] = useState<any>([]);
+  const [certificationsArray, setCertificationsArray] = useState<any>([]);
+  const [educationArray, setEducationArray] = useState<any>([]);
   const [sessionState, setSessionState] = useState<Session | undefined | null>(
     undefined
   );
@@ -58,10 +69,63 @@ const UserProfile = () => {
   async function updateUserData() {
     if (session?.user.email) {
       setLoading(true);
+
       const updatedUserDetails = {
         ...userDetails,
         emailID: session?.user.email,
+        experienceArray: experienceArray,
+        certificationsArray: certificationsArray,
+        educationArray: educationArray, // Add education array
       };
+
+      if (experienceArray && experienceArray.length > 0) {
+        const updatedExperienceArray = experienceArray.map((exp: any) => ({
+          where: { id: exp.id },
+          data: {
+            company: exp.company,
+            position: exp.position,
+            duration: exp.duration,
+            employmentType: exp.employmentType,
+          },
+        }));
+
+        updatedUserDetails.experience = {
+          upsert: updatedExperienceArray,
+        };
+      }
+
+      if (certificationsArray && certificationsArray.length > 0) {
+        const updatedCertificationsArray = certificationsArray.map(
+          (cert: any) => ({
+            where: { id: cert.id },
+            data: {
+              course: cert.course,
+              source: cert.source,
+            },
+          })
+        );
+
+        updatedUserDetails.certifications = {
+          upsert: updatedCertificationsArray,
+        };
+      }
+
+      if (educationArray && educationArray.length > 0) {
+        const updatedEducationArray = educationArray.map((edu: any) => ({
+          where: { id: edu.id }, // You might need to adjust this depending on your schema
+          data: {
+            institute: edu.institute,
+            course: edu.course,
+            description: edu.description,
+          },
+        }));
+
+        updatedUserDetails.education = {
+          upsert: updatedEducationArray,
+        };
+      }
+
+      console.log(updatedUserDetails);
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/user-actions/update-user`,
@@ -75,6 +139,7 @@ const UserProfile = () => {
       );
 
       if (response.ok) {
+        await updateRedisUser();
         setUserUpdated(!userUpdated);
         const data = await response.json();
         const updatedField: any = Object.keys(data)[0];
@@ -123,6 +188,39 @@ const UserProfile = () => {
     }
   }
 
+  async function updateRedisUser() {
+    setLoading(true);
+    if (session?.user.email) {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/redis/get-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            emailID: session?.user.email,
+          }),
+        }
+      );
+
+      const data = await response.json();
+      if (typeof data === "string") {
+        const userData = JSON.parse(data);
+        setUserData(userData);
+      } else {
+        setUserData(data);
+      }
+
+      setUserUpdated(true);
+      setLoading(false);
+      setUserDataFetched(true);
+    } else {
+      setUserDataFetched(true);
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
     getUserData();
     setIsMounted(true);
@@ -133,6 +231,8 @@ const UserProfile = () => {
       getUserData();
     }
   }, [isMounted, session?.user]);
+
+  console.log("userData?.education", userData);
 
   if (loading && sessionState === undefined) {
     return (
@@ -147,6 +247,7 @@ const UserProfile = () => {
   }
 
   return (
+    <>
     <div className="flex w-full flex-col font-outfit md:flex-row">
       <Dialog onOpenChange={getUserData}>
         {/* Left Side */}
@@ -167,9 +268,13 @@ const UserProfile = () => {
               />
             </div>
             <div className="flex items-center justify-center">
-              <DialogTrigger onClick={() => setTabValue("upload-photo")}>
-                <Button className="py-2">Upload Photo</Button>
-              </DialogTrigger>
+              {session?.user ? (
+                <DialogTrigger onClick={() => setTabValue("upload-photo")}>
+                  <Button onClick={() => {}}>Edit</Button>
+                </DialogTrigger>
+              ) : (
+                <Button onClick={() => setShowAuthModal(true)}>Edit</Button>
+              )}
             </div>
           </div>
 
@@ -187,9 +292,15 @@ const UserProfile = () => {
                       {userData && userData.name ? userData.name : "User"}
                     </div>
                     <div className="flex items-center justify-center">
-                      <DialogTrigger onClick={() => setTabValue("edit-name")}>
-                        <Button onClick={() => {}}>Edit</Button>
-                      </DialogTrigger>
+                      {session?.user ? (
+                        <DialogTrigger onClick={() => setTabValue("edit-name")}>
+                          <Button onClick={() => {}}>Edit</Button>
+                        </DialogTrigger>
+                      ) : (
+                        <Button onClick={() => setShowAuthModal(true)}>
+                          Edit
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -203,9 +314,17 @@ const UserProfile = () => {
                         : "Login to update your E-mail!"}
                     </div>
                     <div className="flex items-center justify-center">
-                      <DialogTrigger>
-                        <Button onClick={() => {}}>Edit</Button>
-                      </DialogTrigger>
+                      {session?.user ? (
+                        <DialogTrigger
+                          onClick={() => setTabValue("edit-email")}
+                        >
+                          <Button onClick={() => {}}>Edit</Button>
+                        </DialogTrigger>
+                      ) : (
+                        <Button onClick={() => setShowAuthModal(true)}>
+                          Edit
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -222,7 +341,17 @@ const UserProfile = () => {
                         : "Update after logging."}
                     </div>
                     <div className="flex items-center justify-center">
-                      <Button onClick={() => {}}>Edit</Button>
+                      {session?.user ? (
+                        <DialogTrigger
+                          onClick={() => setTabValue("edit-phone")}
+                        >
+                          <Button onClick={() => {}}>Edit</Button>
+                        </DialogTrigger>
+                      ) : (
+                        <Button onClick={() => setShowAuthModal(true)}>
+                          Edit
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -242,9 +371,15 @@ const UserProfile = () => {
                     </span>
                   </div>
                   <div className="">
-                    <DialogTrigger onClick={() => setTabValue("edit-about")}>
-                      <Button onClick={() => {}}>Edit</Button>
-                    </DialogTrigger>
+                    {session?.user ? (
+                      <DialogTrigger onClick={() => setTabValue("edit-about")}>
+                        <Button onClick={() => {}}>Edit</Button>
+                      </DialogTrigger>
+                    ) : (
+                      <Button onClick={() => setShowAuthModal(true)}>
+                        Edit
+                      </Button>
+                    )}
                   </div>
                 </div>
                 <div className="mt-4 text-[#49454F] opacity-80">
@@ -260,19 +395,26 @@ const UserProfile = () => {
               <div className="flex w-full flex-col text-black">
                 <div className="flex justify-between">
                   <div className="text-2xl ">Skills</div>
-                  <DialogTrigger onClick={() => setTabValue("edit-skills")}>
-                    <Button onClick={() => {}}>Edit</Button>
-                  </DialogTrigger>
+                  {session?.user ? (
+                    <DialogTrigger onClick={() => setTabValue("edit-skills")}>
+                      <Button onClick={() => {}}>Edit</Button>
+                    </DialogTrigger>
+                  ) : (
+                    <Button onClick={() => setShowAuthModal(true)}>Edit</Button>
+                  )}
                 </div>
                 <div className="mt-4 flex flex-col">
-                  {/* Update Later */}
-                  {userData && userData.skills
-                    ? userData?.skills?.map((skill: string) => (
-                        <div key={skill} className="text-md opacity-90">
-                          {skill}
-                        </div>
-                      ))
-                    : "Update your skills by clicking Edit!"}
+                  {userData && userData.skills ? (
+                    userData?.skills?.map((skill: string) => (
+                      <div key={skill} className="text-md opacity-90">
+                        {skill}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-[#49454F] opacity-80">
+                      Update your skills by clicking Edit!
+                    </div>
+                  )}
                 </div>
               </div>
             </Card>
@@ -288,11 +430,17 @@ const UserProfile = () => {
                 <div className="flex w-[70%] flex-col">
                   <div className="flex justify-between text-2xl text-[#222222] opacity-90">
                     <div>Professional Details</div>
-                    <DialogTrigger
-                      onClick={() => setTabValue("edit-professional-details")}
-                    >
-                      <Button onClick={() => {}}>Edit</Button>
-                    </DialogTrigger>
+                    {session?.user ? (
+                      <DialogTrigger
+                        onClick={() => setTabValue("edit-professional-details")}
+                      >
+                        <Button onClick={() => {}}>Edit</Button>
+                      </DialogTrigger>
+                    ) : (
+                      <Button onClick={() => setShowAuthModal(true)}>
+                        Edit
+                      </Button>
+                    )}
                   </div>
                   <div className="mt-2 text-xl text-[#49454F] opacity-80">
                     {userData?.professionalDetails ||
@@ -312,39 +460,45 @@ const UserProfile = () => {
               <div className="flex w-full flex-col">
                 <div className="flex justify-between">
                   <div className="text-2xl text-black">Certifications</div>
-                  <DialogTrigger
-                    onClick={() => setTabValue("edit-certifications")}
-                  >
-                    <Button onClick={() => {}}>Edit</Button>
-                  </DialogTrigger>
+                  {session?.user ? (
+                    <DialogTrigger
+                      onClick={() => setTabValue("edit-certifications")}
+                    >
+                      <Button>Edit</Button>
+                    </DialogTrigger>
+                  ) : (
+                    <Button onClick={() => setShowAuthModal(true)}>Edit</Button>
+                  )}
                 </div>
                 <div className="mt-4">
-                  <Card className="rounded-full p-1">
+                  <Card className="rounded-full">
                     <div className="flex">
-                      {/* {userData && userData.certifications.length > 0 ? (
+                      {userData && userData.certifications.length > 0 ? (
                         userData.certifications.map((certificate: any) => (
-                          <>
-                            <div className="ml-10 flex w-[10%] items-center justify-center">
+                          <div
+                            key={certificate.id}
+                            className="flex w-full items-center"
+                          >
+                            <div className="flex w-1/5 items-center justify-center">
                               <IoIosMedal color="#FFCE10" size={50} />
                             </div>
-                            <div className="flex w-[90%] flex-col items-center justify-center text-[#49454F] opacity-80">
-                              <div className="text-3xl ">{certificate}</div>
-                              <div className="text-xl">OruPhones</div>
+                            <div className="flex w-4/5 flex-col items-center justify-center text-[#49454F] opacity-80">
+                              <div className="text-3xl ">
+                                {certificate.course}
+                              </div>
+                              <div className="text-xl">
+                                {certificate.source}
+                              </div>
                             </div>
-                          </>
+                          </div>
                         ))
                       ) : (
-                        <>
-                          <div className="ml-10 flex w-[10%] items-center justify-center">
-                            <IoIosMedal color="#FFCE10" size={50} />
+                        <div className="flex w-full items-center justify-center p-4">
+                          <div className="w-4/5 text-xl text-[#49454F] opacity-80">
+                            No certificates at the moment.
                           </div>
-                          <div className="flex w-[90%] flex-col items-center justify-center text-[#49454F] opacity-80">
-                            <div className="text-xl ">
-                              Not certificates at the time.
-                            </div>
-                          </div>
-                        </>
-                      )} */}
+                        </div>
+                      )}
                     </div>
                   </Card>
                 </div>
@@ -354,63 +508,52 @@ const UserProfile = () => {
 
           {/* Experience */}
           <div className="mt-6">
-            <Card className="border-none pt-0  shadow-none ">
+            <Card className="border-none pt-0 shadow-none">
               <div className="flex w-full flex-col">
                 <div className="flex justify-between">
                   <div className="text-2xl text-black">Experience</div>
-                  <DialogTrigger onClick={() => setTabValue("edit-experience")}>
-                    <Button onClick={() => {}}>Edit</Button>
-                  </DialogTrigger>
+                  {session?.user ? (
+                    <DialogTrigger
+                      onClick={() => setTabValue("edit-experience")}
+                    >
+                      <Button onClick={() => {}}>Edit</Button>
+                    </DialogTrigger>
+                  ) : (
+                    <Button onClick={() => setShowAuthModal(true)}>Edit</Button>
+                  )}
                 </div>
                 <div className="mt-4">
-                  <Card>
-                    <div className="flex w-full items-center">
-                      <div className="flex w-[80%] flex-col pr-3">
-                        <div className="flex justify-between text-xl text-[#222222] opacity-90">
-                          <div>7 Years (2014-2021)</div>
-                          <div>Full-Time</div>
+                  {userData && userData.experience ? (
+                    userData?.experience?.map((experience: any) => (
+                      <Card key={experience.id} className="mb-4">
+                        <div className="flex w-full items-center">
+                          <div className="flex w-[80%] flex-col pr-3">
+                            <div className="flex justify-between text-xl text-[#222222] opacity-90">
+                              <div>{experience.duration}</div>
+                              <div>{experience.employmentType}</div>
+                            </div>
+                            <div className="flex justify-between text-lg text-[#49454F] opacity-80">
+                              <div>{experience.company}</div>
+                              <div>{experience.position}</div>
+                            </div>
+                          </div>
+                          <div className="w-[20%]">
+                            <Image
+                              src="/image 13.png"
+                              width={100}
+                              height={100}
+                              className="h-full w-full"
+                              alt="Company Logo"
+                            />
+                          </div>
                         </div>
-                        <div className="flex justify-between text-lg text-[#49454F] opacity-80">
-                          <div>OruPhones</div>
-                          <div>-- Full Stack Dev</div>
-                        </div>
-                      </div>
-                      <div className="w-[20%]">
-                        <Image
-                          src="/image 13.png"
-                          width={100}
-                          height={100}
-                          className="h-full w-full"
-                          alt="Compan Logo"
-                        />
-                      </div>
+                      </Card>
+                    ))
+                  ) : (
+                    <div className="text-[#49454F] opacity-80">
+                      You do not possess any Experience.
                     </div>
-                  </Card>
-                </div>
-                <div className="mt-4">
-                  <Card>
-                    <div className="flex w-full items-center">
-                      <div className="flex w-[80%] flex-col pr-3">
-                        <div className="flex justify-between text-xl text-[#222222] opacity-90">
-                          <div>6 Months</div>
-                          <div>Intern</div>
-                        </div>
-                        <div className="flex justify-between text-lg text-[#49454F] opacity-80">
-                          <div>OruPhones</div>
-                          <div>-- Full Stack Developer</div>
-                        </div>
-                      </div>
-                      <div className="w-[20%]">
-                        <Image
-                          src="/image 13.png"
-                          width={100}
-                          height={100}
-                          className="h-full w-full"
-                          alt="Compan Logo"
-                        />
-                      </div>
-                    </div>
-                  </Card>
+                  )}
                 </div>
               </div>
             </Card>
@@ -422,30 +565,44 @@ const UserProfile = () => {
               <div className="flex flex-col">
                 <div className="flex justify-between">
                   <div className="text-2xl text-black">Education</div>
-                  <Button>Edit</Button>
+                  {session?.user ? (
+                    <DialogTrigger
+                      onClick={() => setTabValue("edit-education")}
+                    >
+                      <Button onClick={() => {}}>Edit</Button>
+                    </DialogTrigger>
+                  ) : (
+                    <Button onClick={() => setShowAuthModal(true)}>Edit</Button>
+                  )}
                 </div>
                 <div className="mt-4">
-                  <Card>
-                    <div className="flex flex-col">
-                      <div className="text-3xl text-[#413B89]">
-                        IIT Hyderabad
-                      </div>
-                      <div className="flex justify-between p-2 pr-4 text-xl text-black opacity-90">
-                        <div className="">(2010-2014)</div>
-                        <div className="">Btech</div>
-                      </div>
-                      <div className="text-[#49454F] opacity-80">
-                        Lorem ipsum dolor, sit amet consectetur adipisicing
-                        elit. Obcaecati quis sequi, voluptates vitae ipsa nam
-                        voluptatibus deserunt ab? Suscipit sit tempore nihil{" "}
-                      </div>
+                  {userData && userData.education ? (
+                    userData?.education?.map((education: any) => (
+                      <Card key={education.id} className="mb-4">
+                        <div className="flex flex-col">
+                          <div className="flex items-end justify-between p-1 pr-4 text-xl text-black opacity-90">
+                            <div className="text-3xl text-[#413B89]">
+                              {education.institute}
+                            </div>
+                            <div className="">{education.course}</div>
+                          </div>
+                          <div className="text-[#49454F] opacity-80">
+                            {education.description}
+                          </div>
+                        </div>
+                      </Card>
+                    ))
+                  ) : (
+                    <div className="text-[#49454F] opacity-80">
+                      Login to update your education data.
                     </div>
-                  </Card>
+                  )}
                 </div>
               </div>
             </Card>
           </div>
         </div>
+
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Update your details</DialogTitle>
@@ -501,7 +658,7 @@ const UserProfile = () => {
               <Input
                 type="text"
                 value={userDetails.email}
-                placeholder="Your Name"
+                placeholder="Your Email"
                 onChange={(event) =>
                   setUserDetails({ ...userDetails, email: event.target.value })
                 }
@@ -521,7 +678,7 @@ const UserProfile = () => {
               <Input
                 type="text"
                 value={userDetails.phone}
-                placeholder="Your Name"
+                placeholder="Your Phone"
                 onChange={(event) =>
                   setUserDetails({ ...userDetails, phone: event.target.value })
                 }
@@ -531,7 +688,7 @@ const UserProfile = () => {
                 className="mt-2"
                 onClick={updateUserData}
               >
-                Update Name
+                Update Phone Number
               </Button>
             </TabsContent>
             <TabsContent
@@ -541,7 +698,7 @@ const UserProfile = () => {
               <Input
                 type="text"
                 value={userDetails.about}
-                placeholder="Your Name"
+                placeholder="Tell everyone about you!"
                 onChange={(event) =>
                   setUserDetails({ ...userDetails, about: event.target.value })
                 }
@@ -611,7 +768,7 @@ const UserProfile = () => {
               <Input
                 type="text"
                 value={userDetails.professionalDetails}
-                placeholder="Your Name"
+                placeholder="Your Professional Details"
                 onChange={(event) =>
                   setUserDetails({
                     ...userDetails,
@@ -631,88 +788,228 @@ const UserProfile = () => {
               value="edit-certifications"
               className="flex w-full flex-col items-center justify-center"
             >
-              {/* {userDetails.certifications &&
-                userDetails.certifications.map(
-                  (certification: any, index: any) => (
-                    <div key={index} className="mb-2">
+              <div className="flex w-full flex-col space-y-4">
+                {certificationsArray.map((cert: any, index: any) => (
+                  <div
+                    key={index}
+                    className="flex flex-col items-center justify-center gap-2"
+                  >
+                    <div className="flex-1">
                       <Input
                         type="text"
-                        value={certification.course}
                         placeholder="Course"
-                        onChange={(event) =>
-                          setUserDetails((prevUserDetails: any) => {
-                            const updatedCertifications = [
-                              ...prevUserDetails.certifications,
-                            ];
-                            updatedCertifications[index].course =
-                              event.target.value;
-                            return {
-                              ...prevUserDetails,
-                              certifications: updatedCertifications,
-                            };
-                          })
-                        }
-                      />
-                      <Input
-                        type="text"
-                        value={certification.source}
-                        placeholder="Source"
-                        onChange={(event) =>
-                          setUserDetails((prevUserDetails: any) => {
-                            const updatedCertifications = [
-                              ...prevUserDetails.certifications,
-                            ];
-                            updatedCertifications[index].source =
-                              event.target.value;
-                            return {
-                              ...prevUserDetails,
-                              certifications: updatedCertifications,
-                            };
-                          })
-                        }
+                        value={cert.course}
+                        onChange={(event) => {
+                          const updatedCertificationsArray = [
+                            ...certificationsArray,
+                          ];
+                          updatedCertificationsArray[index].course =
+                            event.target.value;
+                          setCertificationsArray(updatedCertificationsArray);
+                        }}
                       />
                     </div>
-                  )
-                )} */}
-              <Button
-                variant="ghost"
-                className="mt-2"
-                onClick={() =>
-                  setUserDetails((prevUserDetails: any) => ({
-                    ...prevUserDetails,
-                    certifications: [
-                      ...(prevUserDetails.certifications || []),
+                    <div className="flex-1">
+                      <Input
+                        type="text"
+                        placeholder="Source"
+                        value={cert.source}
+                        onChange={(event) => {
+                          const updatedCertificationsArray = [
+                            ...certificationsArray,
+                          ];
+                          updatedCertificationsArray[index].source =
+                            event.target.value;
+                          setCertificationsArray(updatedCertificationsArray);
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+                <Button
+                  onClick={() =>
+                    setCertificationsArray([
+                      ...certificationsArray,
                       { course: "", source: "" },
-                    ],
-                  }))
-                }
-              >
-                Click to start adding
-              </Button>
-              <Button
-                variant="destructive"
-                className="mt-2"
-                onClick={updateUserData}
-              >
-                Update Your Certificates
-              </Button>
+                    ])
+                  }
+                >
+                  Add Certification
+                </Button>
+                <Button
+                  variant="destructive"
+                  className="mt-2"
+                  onClick={updateUserData}
+                >
+                  Update Certifications
+                </Button>
+              </div>
             </TabsContent>
+
             <TabsContent
               value="edit-experience"
               className="flex w-full flex-col items-center justify-center"
             >
-              Change your password here.
+              <div className="flex w-full flex-col space-y-4">
+                {experienceArray.map((exp: any, index: any) => (
+                  <div
+                    key={index}
+                    className="flex flex-col items-center justify-center gap-2"
+                  >
+                    <div className="flex-1">
+                      <Input
+                        type="text"
+                        placeholder="Company"
+                        value={exp.company}
+                        onChange={(event) => {
+                          const updatedExperienceArray = [...experienceArray];
+                          updatedExperienceArray[index].company =
+                            event.target.value;
+                          setExperienceArray(updatedExperienceArray);
+                        }}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <Input
+                        type="text"
+                        placeholder="Position"
+                        value={exp.position}
+                        onChange={(event) => {
+                          const updatedExperienceArray = [...experienceArray];
+                          updatedExperienceArray[index].position =
+                            event.target.value;
+                          setExperienceArray(updatedExperienceArray);
+                        }}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <Input
+                        type="text"
+                        placeholder="Duration"
+                        value={exp.duration}
+                        onChange={(event) => {
+                          const updatedExperienceArray = [...experienceArray];
+                          updatedExperienceArray[index].duration =
+                            event.target.value;
+                          setExperienceArray(updatedExperienceArray);
+                        }}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <select
+                        value={exp.employmentType}
+                        onChange={(event) => {
+                          const updatedExperienceArray = [...experienceArray];
+                          updatedExperienceArray[index].employmentType =
+                            event.target.value;
+                          setExperienceArray(updatedExperienceArray);
+                        }}
+                        className="rounded-lg border-2 bg-none p-1"
+                      >
+                        <option value="">Select Employment Type</option>
+                        <option value="internship">Internship</option>
+                        <option value="job">Job</option>
+                        <option value="contract">Contract</option>
+                      </select>
+                    </div>
+                  </div>
+                ))}
+                <Button
+                  onClick={() =>
+                    setExperienceArray([
+                      ...experienceArray,
+                      { company: "", position: "" },
+                    ])
+                  }
+                >
+                  Add Experience
+                </Button>
+                <Button
+                  variant="destructive"
+                  className="mt-2"
+                  onClick={updateUserData}
+                >
+                  Update Experience
+                </Button>
+              </div>
             </TabsContent>
             <TabsContent
               value="edit-education"
               className="flex w-full flex-col items-center justify-center"
             >
-              Change your password here.
+              <div className="flex w-full flex-col space-y-4">
+                {educationArray.map((edu: any, index: any) => (
+                  <div
+                    key={index}
+                    className="flex flex-col items-center justify-center gap-2"
+                  >
+                    <div className="flex-1">
+                      <Input
+                        type="text"
+                        placeholder="Institute"
+                        value={edu.institute}
+                        onChange={(event) => {
+                          const updatedEducationArray = [...educationArray];
+                          updatedEducationArray[index].institute =
+                            event.target.value;
+                          setEducationArray(updatedEducationArray);
+                        }}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <Input
+                        type="text"
+                        placeholder="Course"
+                        value={edu.course}
+                        onChange={(event) => {
+                          const updatedEducationArray = [...educationArray];
+                          updatedEducationArray[index].course =
+                            event.target.value;
+                          setEducationArray(updatedEducationArray);
+                        }}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <Input
+                        type="text"
+                        placeholder="Description"
+                        value={edu.description}
+                        onChange={(event) => {
+                          const updatedEducationArray = [...educationArray];
+                          updatedEducationArray[index].description =
+                            event.target.value;
+                          setEducationArray(updatedEducationArray);
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+                <Button
+                  onClick={() =>
+                    setEducationArray([
+                      ...educationArray,
+                      { institute: "", course: "", description: "" },
+                    ])
+                  }
+                >
+                  Add Education
+                </Button>
+                <Button
+                  variant="destructive"
+                  className="mt-2"
+                  onClick={updateUserData}
+                >
+                  Update Education
+                </Button>
+              </div>
             </TabsContent>
           </Tabs>
         </DialogContent>
       </Dialog>
     </div>
+    {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+    </>
+
   );
 };
 

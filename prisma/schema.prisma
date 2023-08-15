@@ -55,16 +55,33 @@ model User {
     phone               String?
     about               String?
     professionalDetails String?
-    company             String?
-    position            String?
     skills              String[]
-    experience          String[]
-    education           String[]
     connections         String[]
+    experience          Experience[]
+    education           Education[]
     certifications      Certification[]
     imageUrl            String?
     accounts            Account[]
     sessions            Session[]
+}
+
+model Education {
+    id          String @id @default(cuid()) @map("_id")
+    institute   String
+    course      String
+    description String
+    user        User   @relation(fields: [userId], references: [id])
+    userId      String
+}
+
+model Experience {
+    id             String  @id @default(cuid()) @map("_id")
+    company        String?
+    position       String?
+    employmentType String?
+    duration       String?
+    user           User?   @relation(fields: [userId], references: [id])
+    userId         String?
 }
 
 model Certification {

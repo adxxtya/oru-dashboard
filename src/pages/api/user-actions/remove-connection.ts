@@ -7,26 +7,33 @@ export default async function handler(
 ) {
   const { myEmail, userEmail } = req.body;
 
-  if (!userEmail) {
-    return res.status(400).json({ error: "No userEmail provided." });
+  if (!userEmail || !myEmail) {
+    return res.status(400).json({ error: "Invalid data provided." });
   }
 
-  if (!myEmail) {
-    return res.status(400).json({ error: "No userEmail provided." });
-  }
   try {
-    const user = await prisma.user.findUnique({
+    const myUser = await prisma.user.findUnique({
       where: {
         email: myEmail,
       },
     });
 
-    if (!user) {
+    const otherUser = await prisma.user.findUnique({
+      where: {
+        email: userEmail,
+      },
+    });
+
+    if (!myUser || !otherUser) {
       return res.status(404).json({ error: "User not found." });
     }
 
-    const updatedConnections = user.connections.filter(
+    const updatedMyConnections = myUser.connections.filter(
       (email) => email !== userEmail
+    );
+
+    const updatedOtherConnections = otherUser.connections.filter(
+      (email) => email !== myEmail
     );
 
     await prisma.user.update({
@@ -34,7 +41,16 @@ export default async function handler(
         email: myEmail,
       },
       data: {
-        connections: updatedConnections,
+        connections: updatedMyConnections,
+      },
+    });
+
+    await prisma.user.update({
+      where: {
+        email: userEmail,
+      },
+      data: {
+        connections: updatedOtherConnections,
       },
     });
 
