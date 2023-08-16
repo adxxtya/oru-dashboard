@@ -221,7 +221,11 @@ const Connections: React.FC<ConnectionsProps> = ({}) => {
                               </div>
                               <div className="w-[80%]">
                                 <Image
-                                  src={connectedUser.image || "/user.png"}
+                                  src={
+                                    connectedUser.imageUrl ||
+                                    connectedUser.image ||
+                                    "/user.png"
+                                  }
                                   width={1000}
                                   height={1000}
                                   className="h-36 w-36 rounded-full object-contain"
@@ -309,7 +313,9 @@ const Connections: React.FC<ConnectionsProps> = ({}) => {
                               </div>
                               <div className="w-[80%]">
                                 <Image
-                                  src={user.image || "/user.png"}
+                                  src={
+                                    user.imageUrl || user.image || "/user.png"
+                                  }
                                   width={1000}
                                   height={1000}
                                   className="h-36 w-36 rounded-full object-contain"
@@ -326,25 +332,21 @@ const Connections: React.FC<ConnectionsProps> = ({}) => {
                   })}
                 </>
               ) : (
-                <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 py-12 sm:px-6 lg:px-8">
-                  <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-md">
-                    <svg
-                      className="mx-auto h-12 w-12 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
-                      />
-                    </svg>
-                    <p className="mt-4 text-center text-lg text-gray-500">
-                      No users on the platform
-                    </p>
-                  </div>
+                <div className="flex h-52 w-full flex-col items-center justify-center bg-[##FFFFFF] text-center text-gray-500">
+                  <svg
+                    className="mx-auto h-12 w-12 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
+                    />
+                  </svg>
+                  <p className="mt-2">No users left on platform.</p>
                 </div>
               )}
             </div>
